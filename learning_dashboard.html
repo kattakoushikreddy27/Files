@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--surface-0, #f5f5f5);
+            color: var(--text-primary, #1a1a1a);
+            padding: 20px;
+        }
+
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--text-secondary, #666);
+            font-size: 14px;
+        }
+
+        .filter-tabs {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border: 0.5px solid var(--border, #ccc);
+            background: var(--surface-2, #fff);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            color: var(--text-primary, #1a1a1a);
+        }
+
+        .tab-btn.active {
+            background: var(--fill-accent, #185fa5);
+            color: white;
+            border-color: var(--fill-accent, #185fa5);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--border-strong, #999);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .topic-card {
+            background: var(--surface-2, #fff);
+            border: 0.5px solid var(--border, #ddd);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .topic-card:hover {
+            border-color: var(--border-strong, #999);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .difficulty-easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .interview-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #e7f3ff;
+            color: #185fa5;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: var(--text-secondary, #666);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .topics-list {
+            margin-bottom: 16px;
+        }
+
+        .topic-item {
+            padding: 8px 0;
+            font-size: 13px;
+            color: var(--text-primary, #1a1a1a);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topic-item::before {
+            content: '▸';
+            color: var(--text-secondary, #999);
+            font-weight: bold;
+        }
+
+        .resources {
+            border-top: 0.5px solid var(--border, #ddd);
+            padding-top: 12px;
+        }
+
+        .resource-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary, #666);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 6px 0;
+            font-size: 12px;
+            color: #185fa5;
+            text-decoration: none;
+            border-bottom: 0.5px solid var(--border, #eee);
+            padding-bottom: 6px;
+            transition: color 0.2s;
+        }
+
+        .resource-link:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .resource-link:hover {
+            color: #0c2d5c;
+            text-decoration: underline;
+        }
+
+        .resource-type {
+            display: inline-block;
+            font-size: 10px;
+            background: var(--surface-1, #f0f0f0);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 6px;
+            color: var(--text-secondary, #666);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📚 Learning Dashboard</h1>
+    <p>Java, Spring Boot, Angular, DSA & DevOps — Everything you need in one place</p>
+</div>
+
+<div class="filter-tabs">
+    <button class="tab-btn active" onclick="filterTopic('all')">All Topics</button>
+    <button class="tab-btn" onclick="filterTopic('java')">Java</button>
+    <button class="tab-btn" onclick="filterTopic('springboot')">Spring Boot</button>
+    <button class="tab-btn" onclick="filterTopic('angular')">Angular</button>
+    <button class="tab-btn" onclick="filterTopic('dsa')">DSA</button>
+    <button class="tab-btn" onclick="filterTopic('devops')">DevOps</button>
+</div>
+
+<div class="container" id="topicsContainer"></div>
+
+<script>
+const topicsData = [
+    // ===== JAVA =====
+    {
+        id: 1,
+        topic: 'java',
+        title: 'OOP Fundamentals',
+        difficulty: 'easy',
+        interview: true,
+        description: 'Classes, objects, inheritance, polymorphism, abstraction, encapsulation',
+        subtopics: [
+            'Classes & Objects',
+            'Inheritance & Polymorphism',
+            'Interfaces & Abstract Classes',
+            'Encapsulation Principles'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Java OOP', type: 'Article', url: 'https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/' },
+            { name: 'Java OOP Tutorial (Telusko)', type: 'Video', url: 'https://www.youtube.com/watch?v=xk4_1vDrzzo' },
+            { name: 'Oracle Java Docs - Classes', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/java/concepts/' }
+        ]
+    },
+    {
+        id: 2,
+        topic: 'java',
+        title: 'Collections Framework',
+        difficulty: 'medium',
+        interview: true,
+        description: 'List, Set, Map, Queue, Deque, ArrayList, HashMap, HashSet, TreeMap',
+        subtopics: [
+            'List Interface & Implementations',
+            'Set Interface & Implementations',
+            'Map Interface & Implementations',
+            'Queue & Deque',
+            'Iterators & Comparators'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Collections', type: 'Article', url: 'https://www.geeksforgeeks.org/collections-in-java-2/' },
+            { name: 'Java Collections Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=EJI7LQI5GBo' },
+            { name: 'Oracle Java Collections', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/collections/' }
+        ]
+    },
+    {
+        id: 3,
+        topic: 'java',
+        title: 'Exception Handling',
+        difficulty: 'easy',
+        interview: true,
+        description: 'Try-catch, throws, custom exceptions, finally block, exception hierarchy',
+        subtopics: [
+            'Exception Hierarchy',
+            'Try-Catch-Finally',
+            'Custom Exceptions',
+            'Throws Declaration',
+            'Best Practices'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Exception Handling', type: 'Article', url: 'https://www.geeksforgeeks.org/exception-handling-in-java/' },
+            { name: 'Exception Handling Full Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=1XAfapkBQjk' },
+            { name: 'Oracle Exception Handling', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/essential/exceptions/' }
+        ]
+    },
+    {
+        id: 4,
+        topic: 'java',
+        title: 'Java 8+ Features',
+        difficulty: 'medium',
+        interview: true,
+        description: 'Lambdas, Streams, Functional Interfaces, Optional, Method References',
+        subtopics: [
+            'Lambda Expressions',
+            'Functional Interfaces',
+            'Streams API',
+            'Optional Class',
+            'Method References',
+            'Default & Static Methods'
+        ],
+        resources: [
+            { name: 'Baeldung Java Streams', type: 'Article', url: 'https://www.baeldung.com/java-streams' },
+            { name: 'Java Streams Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=PQiI-c_duYc' },
+            { name: 'Oracle Streams', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/collections/streams/' }
+        ]
+    },
+    {
+        id: 5,
+        topic: 'java',
+        title: 'Multithreading & Concurrency',
+        difficulty: 'hard',
+        interview: true,
+        description: 'Threads, synchronization, thread safety, concurrent collections, executors',
+        subtopics: [
+            'Thread Creation & Lifecycle',
+            'Synchronization & Locks',
+            'Thread Safety',
+            'Concurrent Collections',
+            'Thread Pools & Executors'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Multithreading', type: 'Article', url: 'https://www.geeksforgeeks.org/multithreading-in-java/' },
+            { name: 'Concurrency Tutorial (Telusko)', type: 'Video', url: 'https://www.youtube.com/watch?v=r_MbozPFZv0' },
+            { name: 'Oracle Concurrency', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/essential/concurrency/' }
+        ]
+    },
+    {
+        id: 6,
+        topic: 'java',
+        title: 'Design Patterns',
+        difficulty: 'medium',
+        interview: true,
+        description: 'Singleton, Builder, Factory, Repository, Observer, Decorator, Strategy',
+        subtopics: [
+            'Creational Patterns',
+            'Structural Patterns',
+            'Behavioral Patterns',
+            'Repository Pattern',
+            'Dependency Injection'
+        ],
+        resources: [
+            { name: 'Refactoring.guru Design Patterns', type: 'Article', url: 'https://refactoring.guru/design-patterns/java' },
+            { name: 'Design Patterns in Java', type: 'Video', url: 'https://www.youtube.com/watch?v=NU_1StN5Tkk' },
+            { name: 'Gang of Four Patterns', type: 'Docs', url: 'https://www.patterns.dev/posts/classic-design-patterns/' }
+        ]
+    },
+
+    // ===== SPRING BOOT =====
+    {
+        id: 7,
+        topic: 'springboot',
+        title: 'Spring Fundamentals',
+        difficulty: 'easy',
+        interview: true,
+        description: 'Dependency Injection, Beans, Annotations, Spring Context, Configuration',
+        subtopics: [
+            'Dependency Injection',
+            '@Component, @Service, @Repository',
+            '@Bean & Configuration',
+            'Spring Context',
+            'Auto-wiring'
+        ],
+        resources: [
+            { name: 'Spring.io - Getting Started', type: 'Docs', url: 'https://spring.io/guides/gs/spring-boot/' },
+            { name: 'Baeldung Spring Dependency Injection', type: 'Article', url: 'https://www.baeldung.com/spring-dependency-injection' },
+            { name: 'Spring Boot Basics (Telusko)', type: 'Video', url: 'https://www.youtube.com/watch?v=35EQXmHKZYs' }
+        ]
+    },
+    {
+        id: 8,
+        topic: 'springboot',
+        title: 'REST APIs & Controllers',
+        difficulty: 'easy',
+        interview: true,
+        description: '@RestController, @RequestMapping, HTTP methods, Request/Response handling',
+        subtopics: [
+            '@RestController Annotation',
+            'HTTP Method Mapping',
+            '@PathVariable & @RequestParam',
+            '@RequestBody & @ResponseBody',
+            'Status Codes & Headers'
+        ],
+        resources: [
+            { name: 'Spring.io - Building REST Service', type: 'Docs', url: 'https://spring.io/guides/gs/rest-service/' },
+            { name: 'Baeldung REST API Guide', type: 'Article', url: 'https://www.baeldung.com/rest-with-spring-tutorial' },
+            { name: 'REST API with Spring Boot', type: 'Video', url: 'https://www.youtube.com/watch?v=RQ0d8KI6Aes' }
+        ]
+    },
+    {
+        id: 9,
+        topic: 'springboot',
+        title: 'Spring Data JPA',
+        difficulty: 'medium',
+        interview: true,
+        description: 'Entities, Repositories, CRUD, Relationships, Query Methods, Pagination',
+        subtopics: [
+            '@Entity & @Table',
+            'Repository Interface',
+            'Query Methods',
+            'Custom Queries',
+            'Pagination & Sorting',
+            'Entity Relationships'
+        ],
+        resources: [
+            { name: 'Spring.io - Data JPA', type: 'Docs', url: 'https://spring.io/guides/gs/accessing-data-jpa/' },
+            { name: 'Baeldung Spring Data JPA', type: 'Article', url: 'https://www.baeldung.com/spring-data-jpa-intro' },
+            { name: 'JPA Complete Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=3anqIP3GJJ0' }
+        ]
+    },
+    {
+        id: 10,
+        topic: 'springboot',
+        title: 'Validation & Exception Handling',
+        difficulty: 'medium',
+        interview: true,
+        description: '@Valid, @ControllerAdvice, GlobalExceptionHandler, custom validators',
+        subtopics: [
+            'Bean Validation',
+            '@Valid & @Validated',
+            'Custom Validators',
+            '@ControllerAdvice',
+            'GlobalExceptionHandler',
+            'Error Responses'
+        ],
+        resources: [
+            { name: 'Baeldung Validation', type: 'Article', url: 'https://www.baeldung.com/spring-boot-bean-validation' },
+            { name: 'Baeldung Exception Handling', type: 'Article', url: 'https://www.baeldung.com/exception-handling-for-rest-with-spring' },
+            { name: 'Spring Validation Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=6AjAG3FHLYA' }
+        ]
+    },
+    {
+        id: 11,
+        topic: 'springboot',
+        title: 'Transactions & Database',
+        difficulty: 'hard',
+        interview: true,
+        description: '@Transactional, ACID, Propagation, Isolation, Hibernate, Lazy Loading',
+        subtopics: [
+            '@Transactional Annotation',
+            'Transaction Propagation',
+            'Isolation Levels',
+            'Lazy vs Eager Loading',
+            'Dirty Checking',
+            'Optimistic Locking'
+        ],
+        resources: [
+            { name: 'Baeldung Transactions', type: 'Article', url: 'https://www.baeldung.com/spring-transactional' },
+            { name: 'Baeldung Hibernate Guide', type: 'Article', url: 'https://www.baeldung.com/hibernate-tutorial' },
+            { name: 'Spring Data & Transactions', type: 'Video', url: 'https://www.youtube.com/watch?v=mnfJyoXvJTQ' }
+        ]
+    },
+    {
+        id: 12,
+        topic: 'springboot',
+        title: 'Security & Authentication',
+        difficulty: 'hard',
+        interview: true,
+        description: 'Spring Security, JWT, OAuth2, Roles, Permissions, Password Encoding',
+        subtopics: [
+            'Spring Security Config',
+            'JWT Tokens',
+            'Role-based Access',
+            'OAuth2 Basics',
+            'Password Encoding'
+        ],
+        resources: [
+            { name: 'Spring Security Reference', type: 'Docs', url: 'https://spring.io/projects/spring-security' },
+            { name: 'Baeldung Spring Security', type: 'Article', url: 'https://www.baeldung.com/spring-security-authentication-and-authorization' },
+            { name: 'JWT with Spring Boot', type: 'Video', url: 'https://www.youtube.com/watch?v=X80nJ5T7YpE' }
+        ]
+    },
+
+    // ===== ANGULAR =====
+    {
+        id: 13,
+        topic: 'angular',
+        title: 'TypeScript Basics',
+        difficulty: 'easy',
+        interview: false,
+        description: 'Types, Interfaces, Classes, Enums, Generics, Decorators',
+        subtopics: [
+            'Type System',
+            'Interfaces & Classes',
+            'Enums',
+            'Generics',
+            'Decorators'
+        ],
+        resources: [
+            { name: 'TypeScript Official Handbook', type: 'Docs', url: 'https://www.typescriptlang.org/docs/' },
+            { name: 'TypeScript Tutorial (Fireship)', type: 'Video', url: 'https://www.youtube.com/watch?v=qwfE7-NdUmQ' },
+            { name: 'GeeksforGeeks TypeScript', type: 'Article', url: 'https://www.geeksforgeeks.org/introduction-to-typescript/' }
+        ]
+    },
+    {
+        id: 14,
+        topic: 'angular',
+        title: 'Components & Templates',
+        difficulty: 'easy',
+        interview: true,
+        description: 'Component creation, Templates, Data binding, Directives, Lifecycle hooks',
+        subtopics: [
+            'Component Structure',
+            'Templates',
+            '{{}} Interpolation',
+            'Property Binding',
+            'Event Binding',
+            'Lifecycle Hooks'
+        ],
+        resources: [
+            { name: 'Angular.io - Components', type: 'Docs', url: 'https://angular.io/guide/component-overview' },
+            { name: 'Angular Components Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=13L2b0k3pv0' },
+            { name: 'Telusko Angular Components', type: 'Video', url: 'https://www.youtube.com/watch?v=XRnNxzAakCU' }
+        ]
+    },
+    {
+        id: 15,
+        topic: 'angular',
+        title: 'Services & Dependency Injection',
+        difficulty: 'medium',
+        interview: true,
+        description: '@Injectable, Service creation, DI, Singleton pattern, Hierarchical injector',
+        subtopics: [
+            '@Injectable Decorator',
+            'Service Creation',
+            'Dependency Injection',
+            'Hierarchical Injectors',
+            'Singleton Services'
+        ],
+        resources: [
+            { name: 'Angular.io - Services', type: 'Docs', url: 'https://angular.io/guide/architecture-services' },
+            { name: 'Angular Services Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=LM35hT-TvEE' },
+            { name: 'Telusko Services & DI', type: 'Video', url: 'https://www.youtube.com/watch?v=P0bQcH7MXH0' }
+        ]
+    },
+    {
+        id: 16,
+        topic: 'angular',
+        title: 'Routing & Navigation',
+        difficulty: 'medium',
+        interview: true,
+        description: 'RouterModule, Routes, Navigation, Route Guards, Lazy Loading',
+        subtopics: [
+            'Route Configuration',
+            'RouterLink & Navigate',
+            'Route Parameters',
+            'Route Guards',
+            'Lazy Loading',
+            'Wildcard Routes'
+        ],
+        resources: [
+            { name: 'Angular.io - Routing', type: 'Docs', url: 'https://angular.io/guide/router' },
+            { name: 'Angular Routing Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=R-mLGKQUnFo' },
+            { name: 'Telusko Routing Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=NaFi7lKMp70' }
+        ]
+    },
+    {
+        id: 17,
+        topic: 'angular',
+        title: 'Forms & Validation',
+        difficulty: 'medium',
+        interview: true,
+        description: 'Template-driven Forms, Reactive Forms, Form Controls, Validation, Submission',
+        subtopics: [
+            'Template-driven Forms',
+            'Reactive Forms',
+            'Form Controls & Groups',
+            'Validation',
+            'Form Submission',
+            'Custom Validators'
+        ],
+        resources: [
+            { name: 'Angular.io - Forms', type: 'Docs', url: 'https://angular.io/guide/forms-overview' },
+            { name: 'Reactive Forms Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=JjU4BZdq4_o' },
+            { name: 'Angular Forms Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=DEDYQl2yWF8' }
+        ]
+    },
+    {
+        id: 18,
+        topic: 'angular',
+        title: 'HTTP Client & APIs',
+        difficulty: 'medium',
+        interview: true,
+        description: 'HttpClient, GET/POST/PUT/DELETE, Interceptors, Error Handling',
+        subtopics: [
+            'HttpClient Module',
+            'HTTP Methods',
+            'Request/Response',
+            'Interceptors',
+            'Error Handling',
+            'Request Headers'
+        ],
+        resources: [
+            { name: 'Angular.io - HTTP Client', type: 'Docs', url: 'https://angular.io/guide/http' },
+            { name: 'HTTP Client Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=xj2SFv8yRJY' },
+            { name: 'Angular API Integration', type: 'Video', url: 'https://www.youtube.com/watch?v=X8oQFxRh6xY' }
+        ]
+    },
+    {
+        id: 19,
+        topic: 'angular',
+        title: 'RxJS & Observables',
+        difficulty: 'hard',
+        interview: true,
+        description: 'Observables, Subjects, Operators, Subscriptions, Async Pipe',
+        subtopics: [
+            'Observables',
+            'Subjects & BehaviorSubject',
+            'Operators (map, filter, switchMap)',
+            'Subscriptions',
+            'Memory Leaks',
+            'Async Pipe'
+        ],
+        resources: [
+            { name: 'Angular.io - RxJS', type: 'Docs', url: 'https://angular.io/guide/rx-library' },
+            { name: 'RxJS Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=PhggNGsSQyQ' },
+            { name: 'RxJS Operators Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=ZMPF2ZF-TDc' }
+        ]
+    },
+
+    // ===== DSA =====
+    {
+        id: 20,
+        topic: 'dsa',
+        title: 'Arrays & Strings',
+        difficulty: 'easy',
+        interview: true,
+        description: 'Array operations, String manipulation, Two-pointer, Sliding window',
+        subtopics: [
+            'Array Operations',
+            'String Manipulation',
+            'Two-Pointer Technique',
+            'Sliding Window',
+            'Prefix Sum'
+        ],
+        resources: [
+            { name: 'NeetCode - Arrays & Hashing', type: 'Article', url: 'https://neetcode.io/roadmap' },
+            { name: 'LeetCode - Easy Array Problems', type: 'Practice', url: 'https://leetcode.com/problems/two-sum/' },
+            { name: 'GeeksforGeeks Array Algorithms', type: 'Article', url: 'https://www.geeksforgeeks.org/fundamentals-of-algorithms/' }
+        ]
+    },
+    {
+        id: 21,
+        topic: 'dsa',
+        title: 'Sorting & Searching',
+        difficulty: 'easy',
+        interview: true,
+        description: 'Bubble sort, Merge sort, Quick sort, Binary search, Hash maps',
+        subtopics: [
+            'Bubble Sort',
+            'Merge Sort',
+            'Quick Sort',
+            'Binary Search',
+            'Hash Map Usage'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Sorting Algorithms', type: 'Article', url: 'https://www.geeksforgeeks.org/sorting-algorithms/' },
+            { name: 'Sorting Algorithms Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=kPRA0W1kEyg' },
+            { name: 'LeetCode Sorting Problems', type: 'Practice', url: 'https://leetcode.com/problems/merge-sorted-array/' }
+        ]
+    },
+    {
+        id: 22,
+        topic: 'dsa',
+        title: 'Recursion & Backtracking',
+        difficulty: 'medium',
+        interview: true,
+        description: 'Base case, Recursive call, Backtracking, Tree traversal, Combinations',
+        subtopics: [
+            'Recursion Basics',
+            'Base & Recursive Case',
+            'Backtracking Pattern',
+            'Tree Traversal',
+            'Combinations & Permutations'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Recursion', type: 'Article', url: 'https://www.geeksforgeeks.org/recursion/' },
+            { name: 'Recursion Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=IJDJ0kBx2LM' },
+            { name: 'LeetCode Recursion Problems', type: 'Practice', url: 'https://leetcode.com/problems/combination-sum/' }
+        ]
+    },
+    {
+        id: 23,
+        topic: 'dsa',
+        title: 'Linked Lists',
+        difficulty: 'medium',
+        interview: true,
+        description: 'Node, Singly linked list, Doubly linked list, Cycles, Reversal',
+        subtopics: [
+            'Node Structure',
+            'Singly Linked List',
+            'Doubly Linked List',
+            'Cycle Detection',
+            'Reversal',
+            'Merge'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Linked Lists', type: 'Article', url: 'https://www.geeksforgeeks.org/data-structures/linked-list/' },
+            { name: 'Linked Lists Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=F8AbOfQwl1c' },
+            { name: 'LeetCode Linked List Problems', type: 'Practice', url: 'https://leetcode.com/problems/reverse-linked-list/' }
+        ]
+    },
+    {
+        id: 24,
+        topic: 'dsa',
+        title: 'Trees & Graphs',
+        difficulty: 'hard',
+        interview: true,
+        description: 'Binary trees, BST, DFS, BFS, Tree traversal, Graph algorithms',
+        subtopics: [
+            'Binary Tree',
+            'Binary Search Tree',
+            'DFS (Depth-First Search)',
+            'BFS (Breadth-First Search)',
+            'Tree Traversals',
+            'Graph Representation'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Trees', type: 'Article', url: 'https://www.geeksforgeeks.org/binary-tree-data-structure/' },
+            { name: 'Trees & Graphs Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=XJ3Q1PCaKHE' },
+            { name: 'LeetCode Tree Problems', type: 'Practice', url: 'https://leetcode.com/problems/binary-tree-inorder-traversal/' }
+        ]
+    },
+    {
+        id: 25,
+        topic: 'dsa',
+        title: 'Dynamic Programming',
+        difficulty: 'hard',
+        interview: true,
+        description: 'Overlapping subproblems, Memoization, Tabulation, Optimization',
+        subtopics: [
+            'Memoization',
+            'Tabulation',
+            'State Definition',
+            'Transition',
+            'Classic DP Problems'
+        ],
+        resources: [
+            { name: 'GeeksforGeeks Dynamic Programming', type: 'Article', url: 'https://www.geeksforgeeks.org/dynamic-programming/' },
+            { name: 'DP Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=oBt53YbR9Kk' },
+            { name: 'LeetCode DP Problems', type: 'Practice', url: 'https://leetcode.com/problems/climbing-stairs/' }
+        ]
+    },
+
+    // ===== DEVOPS =====
+    {
+        id: 26,
+        topic: 'devops',
+        title: 'Git & GitHub Basics',
+        difficulty: 'easy',
+        interview: false,
+        description: 'Repositories, Branches, Commits, Pull Requests, Merging, Conflicts',
+        subtopics: [
+            'Repository Setup',
+            'Branching',
+            'Commits & Push',
+            'Pull Requests',
+            'Merging & Conflicts',
+            'Collaboration'
+        ],
+        resources: [
+            { name: 'GitHub Learning Lab', type: 'Interactive', url: 'https://github.com/skills' },
+            { name: 'Git Documentation', type: 'Docs', url: 'https://git-scm.com/doc' },
+            { name: 'Git & GitHub Crash Course', type: 'Video', url: 'https://www.youtube.com/watch?v=RGOj5yH7evk' }
+        ]
+    },
+    {
+        id: 27,
+        topic: 'devops',
+        title: 'Linux & Command Line',
+        difficulty: 'easy',
+        interview: false,
+        description: 'File system, Permissions, Basic commands, Shell scripting, Package management',
+        subtopics: [
+            'File System',
+            'Permissions (chmod, chown)',
+            'Basic Commands',
+            'Shell Scripting',
+            'Package Management'
+        ],
+        resources: [
+            { name: 'Ubuntu Community Documentation', type: 'Docs', url: 'https://help.ubuntu.com/' },
+            { name: 'Linux Command Line Basics', type: 'Video', url: 'https://www.youtube.com/watch?v=sIqKGQ2nspU' },
+            { name: 'GeeksforGeeks Linux', type: 'Article', url: 'https://www.geeksforgeeks.org/linux-tutorial/' }
+        ]
+    },
+    {
+        id: 28,
+        topic: 'devops',
+        title: 'Docker & Containerization',
+        difficulty: 'medium',
+        interview: false,
+        description: 'Containers, Images, Dockerfile, Docker Compose, Container Registry',
+        subtopics: [
+            'Docker Concepts',
+            'Images & Containers',
+            'Dockerfile',
+            'Docker Compose',
+            'Container Networking'
+        ],
+        resources: [
+            { name: 'Docker Official Documentation', type: 'Docs', url: 'https://docs.docker.com/' },
+            { name: 'Docker Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=fqMOX6JJhGo' },
+            { name: 'Telusko Docker Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=17Bl31rlnRM' }
+        ]
+    },
+    {
+        id: 29,
+        topic: 'devops',
+        title: 'AWS Fundamentals',
+        difficulty: 'medium',
+        interview: false,
+        description: 'EC2, RDS, S3, Lambda, VPC, IAM, CloudWatch, Load Balancing',
+        subtopics: [
+            'EC2 Instances',
+            'RDS Databases',
+            'S3 Storage',
+            'Lambda Functions',
+            'VPC & Networking',
+            'IAM & Security'
+        ],
+        resources: [
+            { name: 'AWS Skill Builder (Free)', type: 'Docs', url: 'https://skillbuilder.aws.com/' },
+            { name: 'AWS for Beginners', type: 'Video', url: 'https://www.youtube.com/watch?v=k1RI5locZE4' },
+            { name: 'Telusko AWS Complete Course', type: 'Video', url: 'https://www.youtube.com/watch?v=Z5XOHBI0x78' }
+        ]
+    },
+    {
+        id: 30,
+        topic: 'devops',
+        title: 'CI/CD Pipelines',
+        difficulty: 'medium',
+        interview: false,
+        description: 'GitHub Actions, Jenkins, Build automation, Deployment, Testing automation',
+        subtopics: [
+            'CI/CD Concepts',
+            'GitHub Actions',
+            'Jenkins Basics',
+            'Build Automation',
+            'Automated Testing',
+            'Deployment Strategies'
+        ],
+        resources: [
+            { name: 'GitHub Actions Documentation', type: 'Docs', url: 'https://docs.github.com/en/actions' },
+            { name: 'CI/CD Pipeline Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=scEDHM3RIpM' },
+            { name: 'Jenkins Complete Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=7KCS70sCoK0' }
+        ]
+    }
+];
+
+function renderTopics(filter = 'all') {
+    const container = document.getElementById('topicsContainer');
+    container.innerHTML = '';
+
+    const filtered = filter === 'all' 
+        ? topicsData 
+        : topicsData.filter(t => t.topic === filter);
+
+    filtered.forEach(topic => {
+        const card = document.createElement('div');
+        card.className = 'topic-card';
+
+        const interviewBadge = topic.interview 
+            ? `<span class="interview-badge">INTERVIEW</span>` 
+            : '';
+
+        const topicsHtml = topic.subtopics
+            .map(t => `<div class="topic-item">${t}</div>`)
+            .join('');
+
+        const resourcesHtml = topic.resources
+            .map(r => `
+                <a href="${r.url}" target="_blank" class="resource-link">
+                    <span class="resource-type">${r.type}</span>${r.name}
+                </a>
+            `)
+            .join('');
+
+        card.innerHTML = `
+            <div class="card-header">
+                <div class="card-title">${topic.title}</div>
+                <span class="difficulty-badge difficulty-${topic.difficulty}">${topic.difficulty.toUpperCase()}</span>
+                ${interviewBadge}
+            </div>
+            <div class="card-description">${topic.description}</div>
+            <div class="topics-list">${topicsHtml}</div>
+            <div class="resources">
+                <div class="resource-header">📚 Resources</div>
+                ${resourcesHtml}
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function filterTopic(topic) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderTopics(topic);
+}
+
+// Initial render
+renderTopics();
+</script>
+
+</body>
+</html>

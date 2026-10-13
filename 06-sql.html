@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>06 — SQL & Database</title><style>
+body{font-family:Arial,sans-serif;background:#f6f7fb;color:#172033;max-width:900px;margin:auto;padding:28px}
+h1{margin-bottom:4px}h2{margin-top:28px;border-bottom:1px solid #ddd;padding-bottom:8px}
+.card{background:white;border:1px solid #e2e6ed;border-radius:12px;padding:16px;margin:14px 0}
+.badge{display:inline-block;padding:4px 8px;border-radius:6px;background:#eef2ff;margin-right:6px;font-size:12px}
+.easy{background:#eaf8ef}.medium{background:#fff5df}.hard{background:#fdecec}.int{background:#eef5ff}
+label{display:block;margin:9px 0}input{margin-right:8px}
+a{display:block;color:#2563eb;text-decoration:none;margin:8px 0}.note{background:#f0f6ff;padding:14px;border-left:4px solid #2563eb}
+</style></head><body>
+<h1>06 — SQL & Database</h1><p>Backend-essential supporting skill</p><div class="card"><h2>SQL fundamentals</h2><span class="badge easy">EASY</span><label><input type="checkbox">SELECT</label><label><input type="checkbox">WHERE</label><label><input type="checkbox">ORDER BY</label><label><input type="checkbox">GROUP BY</label><label><input type="checkbox">HAVING</label><label><input type="checkbox">INSERT</label><label><input type="checkbox">UPDATE</label><label><input type="checkbox">DELETE</label><h3>Resources</h3><a href="https://sqlbolt.com/" target="_blank">SQLBolt — interactive SQL</a></div><div class="card"><h2>Querying</h2><span class="badge medium">MEDIUM</span><label><input type="checkbox">INNER JOIN</label><label><input type="checkbox">LEFT JOIN</label><label><input type="checkbox">RIGHT JOIN</label><label><input type="checkbox">Subqueries</label><label><input type="checkbox">CTEs</label><label><input type="checkbox">CASE</label><label><input type="checkbox">Aggregate functions</label><label><input type="checkbox">Window functions</label></div><div class="card"><h2>Database engineering</h2><span class="badge hard">HARD</span><label><input type="checkbox">Primary keys</label><label><input type="checkbox">Foreign keys</label><label><input type="checkbox">Indexes</label><label><input type="checkbox">Normalization</label><label><input type="checkbox">Transactions</label><label><input type="checkbox">Isolation</label><label><input type="checkbox">Execution plans</label><label><input type="checkbox">Query optimization</label><label><input type="checkbox">Schema design</label></div><div class="note"><b>Rule:</b> Learn → practice → build → debug → explain. Use AI/Copilot, but understand and verify its output.</div>
+<script>
+const key=location.pathname.split('/').pop()||'page';const b=[...document.querySelectorAll('input')];
+try{JSON.parse(localStorage.getItem(key)||'[]').forEach((v,i)=>b[i]&&(b[i].checked=v))}catch(e){}
+b.forEach(x=>x.onchange=()=>localStorage.setItem(key,JSON.stringify(b.map(y=>y.checked))));
+</script></body></html>

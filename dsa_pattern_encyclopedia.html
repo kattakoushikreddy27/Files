@@ -1,0 +1,365 @@
+<html>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 0; }
+.container { padding: 1.5rem 0; }
+.pattern-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; cursor: pointer; transition: all 0.2s ease; }
+.pattern-card:hover { border-color: var(--border-strong); background: var(--surface-1); }
+.pattern-card.active { border: 2px solid var(--border-accent); }
+.pattern-title { font-size: 16px; font-weight: 600; margin: 0 0 0.5rem 0; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.pattern-icon { font-size: 20px; }
+.pattern-clue { font-size: 13px; color: var(--text-secondary); margin: 0.5rem 0 1rem 0; line-height: 1.6; }
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 1rem 0; }
+.badge { background: var(--bg-accent); color: var(--text-accent); padding: 4px 10px; border-radius: var(--radius); font-size: 12px; font-weight: 500; }
+.example-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 1rem; margin-bottom: 0.5rem; }
+.example-list { font-size: 13px; line-height: 1.8; color: var(--text-primary); margin: 0; padding-left: 1.5rem; }
+.example-list li { margin-bottom: 0.4rem; }
+.complexity { display: flex; gap: 12px; margin-top: 1.2rem; padding-top: 1rem; border-top: 0.5px solid var(--border); font-size: 12px; }
+.complexity-item { flex: 1; }
+.complexity-label { color: var(--text-secondary); font-weight: 500; }
+.complexity-value { color: var(--text-primary); margin-top: 0.25rem; }
+.expansion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.pattern-card.active .expansion-content { max-height: 1000px; }
+.arrow { transition: transform 0.2s ease; display: inline-block; margin-left: 6px; }
+.pattern-card.active .arrow { transform: rotate(180deg); }
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 2rem; flex-wrap: wrap; }
+.tab-btn { padding: 6px 14px; border: 0.5px solid var(--border); border-radius: var(--radius); background: transparent; color: var(--text-primary); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+.tab-btn.active { background: var(--bg-accent); color: var(--text-accent); border-color: var(--border-accent); }
+.tab-btn:hover { border-color: var(--border-strong); }
+.difficulty-easy { color: #10b981; }
+.difficulty-medium { color: #f59e0b; }
+.difficulty-hard { color: #ef4444; }
+</style>
+
+<div class="container">
+  <div class="filter-tabs">
+    <button class="tab-btn active" onclick="filterByDifficulty('all')">All patterns</button>
+    <button class="tab-btn" onclick="filterByDifficulty('easy')">Easy start</button>
+    <button class="tab-btn" onclick="filterByDifficulty('medium')">Most common</button>
+    <button class="tab-btn" onclick="filterByDifficulty('hard')">Advanced</button>
+  </div>
+
+  <div class="pattern-card" data-difficulty="easy" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">👆</span>
+      Two Pointers
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Use two indices to traverse an array efficiently, often in a sorted array. Great for finding pairs or rearranging data.</div>
+    <div class="badge-row">
+      <span class="badge">Sorted array</span>
+      <span class="badge difficulty-easy">Easy start</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">When to use</div>
+      <ul class="example-list">
+        <li>Finding a pair that sums to target</li>
+        <li>Removing duplicates from sorted array</li>
+        <li>Reversing an array</li>
+        <li>Container with most water</li>
+      </ul>
+      <div class="example-label">Why it works</div>
+      <p style="font-size: 13px; color: var(--text-primary); margin: 0.5rem 0;">One pointer starts at beginning, one at end. Move inward based on logic. Avoids nested loops.</p>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Time complexity</div>
+          <div class="complexity-value">O(n)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space complexity</div>
+          <div class="complexity-value">O(1)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Prerequisite</div>
+          <div class="complexity-value">Sorted or specific structure</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="easy" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">📦</span>
+      Sliding Window
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Keep a "window" of elements and slide it across the array. Perfect for finding optimal contiguous subarrays.</div>
+    <div class="badge-row">
+      <span class="badge">Contiguous subarrays</span>
+      <span class="badge difficulty-easy">Easy start</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">When to use</div>
+      <ul class="example-list">
+        <li>Max/min sum of k elements</li>
+        <li>Longest substring without repeating chars</li>
+        <li>Best time to buy and sell stock</li>
+        <li>Permutation in string</li>
+      </ul>
+      <div class="example-label">The idea</div>
+      <p style="font-size: 13px; color: var(--text-primary); margin: 0.5rem 0;">Expand window by moving right pointer. Shrink by moving left pointer. Calculate result at each step.</p>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Time complexity</div>
+          <div class="complexity-value">O(n)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space complexity</div>
+          <div class="complexity-value">O(1) to O(k)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Pattern type</div>
+          <div class="complexity-value">Dynamic sizing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="easy" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">🎯</span>
+      Hash Map / Set
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Store data in key-value pairs or unique sets. Super fast lookups and frequency tracking.</div>
+    <div class="badge-row">
+      <span class="badge">Fast lookup</span>
+      <span class="badge difficulty-easy">Easy start</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">When to use</div>
+      <ul class="example-list">
+        <li>Detect duplicates in array</li>
+        <li>Count frequency of elements</li>
+        <li>Check if two strings are anagrams</li>
+        <li>Find missing number in array</li>
+      </ul>
+      <div class="example-label">The trick</div>
+      <p style="font-size: 13px; color: var(--text-primary); margin: 0.5rem 0;">Trade space for time. Store what you've seen. On second encounter, you know it's a duplicate or match.</p>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Time complexity</div>
+          <div class="complexity-value">O(n)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space complexity</div>
+          <div class="complexity-value">O(n)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Best for</div>
+          <div class="complexity-value">Lookups</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="medium" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">🔍</span>
+      Binary Search
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Divide and conquer on sorted data. Jump straight to half the space each time.</div>
+    <div class="badge-row">
+      <span class="badge">Sorted array</span>
+      <span class="badge difficulty-medium">Most common</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">When to use</div>
+      <ul class="example-list">
+        <li>Find target in sorted array</li>
+        <li>Search rotated sorted array</li>
+        <li>Find first/last position of element</li>
+        <li>Search insert position</li>
+      </ul>
+      <div class="example-label">The logic</div>
+      <p style="font-size: 13px; color: var(--text-primary); margin: 0.5rem 0;">Set left and right pointers. Calc mid. Compare target with mid. Move left or right. Repeat until found.</p>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Time complexity</div>
+          <div class="complexity-value">O(log n)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space complexity</div>
+          <div class="complexity-value">O(1)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Requirement</div>
+          <div class="complexity-value">Sorted input</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="medium" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">📚</span>
+      Stack / Queue (LIFO / FIFO)
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Use last-in-first-out or first-in-first-out ordering to solve problems involving order and depth.</div>
+    <div class="badge-row">
+      <span class="badge">Order matters</span>
+      <span class="badge difficulty-medium">Most common</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">Stack problems (LIFO)</div>
+      <ul class="example-list">
+        <li>Valid parentheses matching</li>
+        <li>Undo/Redo functionality</li>
+        <li>Depth-first search</li>
+        <li>Decode string</li>
+      </ul>
+      <div class="example-label">Queue problems (FIFO)</div>
+      <ul class="example-list">
+        <li>Breadth-first search</li>
+        <li>Level-order tree traversal</li>
+        <li>Task scheduling</li>
+      </ul>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Push/Pop</div>
+          <div class="complexity-value">O(1)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space</div>
+          <div class="complexity-value">O(n)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="medium" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">🌳</span>
+      DFS / BFS (Graph Traversal)
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Systematically explore graphs or trees. DFS goes deep, BFS goes wide.</div>
+    <div class="badge-row">
+      <span class="badge">Tree/Graph</span>
+      <span class="badge difficulty-medium">Most common</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">DFS use cases</div>
+      <ul class="example-list">
+        <li>Connected components count</li>
+        <li>Path finding</li>
+        <li>Tree inorder/preorder traversal</li>
+        <li>Topological sort</li>
+      </ul>
+      <div class="example-label">BFS use cases</div>
+      <ul class="example-list">
+        <li>Shortest path (unweighted)</li>
+        <li>Level-order traversal</li>
+        <li>Word ladder</li>
+      </ul>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Time</div>
+          <div class="complexity-value">O(V + E)</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space</div>
+          <div class="complexity-value">O(V)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="hard" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">💭</span>
+      Dynamic Programming
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Break problem into overlapping subproblems. Solve once, store, and reuse results.</div>
+    <div class="badge-row">
+      <span class="badge">Overlapping subproblems</span>
+      <span class="badge difficulty-hard">Advanced</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">When to use</div>
+      <ul class="example-list">
+        <li>Fibonacci sequence</li>
+        <li>Coin change (min coins)</li>
+        <li>Longest increasing subsequence</li>
+        <li>Knapsack problem</li>
+        <li>Edit distance (Levenshtein)</li>
+      </ul>
+      <div class="example-label">Two approaches</div>
+      <p style="font-size: 13px; color: var(--text-primary); margin: 0.5rem 0;"><strong>Top-down (Memoization):</strong> Recursion with caching. <strong>Bottom-up (Tabulation):</strong> Build table from base cases.</p>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Time</div>
+          <div class="complexity-value">Problem-specific</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Space</div>
+          <div class="complexity-value">O(n) to O(n²)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-card" data-difficulty="hard" onclick="toggleCard(this)">
+    <div class="pattern-title">
+      <span class="pattern-icon">⚡</span>
+      Greedy Algorithm
+      <span class="arrow">▼</span>
+    </div>
+    <div class="pattern-clue">Make locally optimal choice at each step, hoping it leads to global optimum.</div>
+    <div class="badge-row">
+      <span class="badge">Local → Global</span>
+      <span class="badge difficulty-hard">Advanced</span>
+    </div>
+    <div class="expansion-content">
+      <div class="example-label">When it works</div>
+      <ul class="example-list">
+        <li>Activity selection problem</li>
+        <li>Huffman coding</li>
+        <li>Jump game (reach end)</li>
+        <li>Gas station (can complete loop)</li>
+      </ul>
+      <div class="example-label">The catch</div>
+      <p style="font-size: 13px; color: var(--text-primary); margin: 0.5rem 0;">Doesn't always work! Prove it works for your specific problem before using it.</p>
+      <div class="complexity">
+        <div class="complexity-item">
+          <div class="complexity-label">Advantage</div>
+          <div class="complexity-value">Fast & simple</div>
+        </div>
+        <div class="complexity-item">
+          <div class="complexity-label">Disadvantage</div>
+          <div class="complexity-value">Not always optimal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleCard(el) {
+  const allCards = document.querySelectorAll('.pattern-card');
+  allCards.forEach(card => {
+    if (card !== el) card.classList.remove('active');
+  });
+  el.classList.toggle('active');
+}
+
+function filterByDifficulty(difficulty) {
+  const cards = document.querySelectorAll('.pattern-card');
+  const buttons = document.querySelectorAll('.tab-btn');
+  
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  cards.forEach(card => {
+    if (difficulty === 'all' || card.dataset.difficulty === difficulty) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+</html>

@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Structures — From Zero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F4;
+    --paper-raised:#FFFFFF;
+    --ink:#1C2541;
+    --ink-soft:#565F7A;
+    --ink-mute:#8B8F9C;
+    --line:#DEDACE;
+    --line-strong:#C6C1B2;
+    --amber:#A8721E;
+    --amber-bg:#F5E9D3;
+    --teal:#296B5C;
+    --teal-bg:#DFEEE9;
+    --coral:#A6432A;
+    --coral-bg:#F5DFD7;
+    --code-bg:#182238;
+    --code-text:#DCE3F0;
+    --code-key:#E8A855;
+    --code-str:#8FCBAE;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.65;
+  }
+  .grid-bg{
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+  }
+  h1,h2,h3{ font-family:'Fraunces',serif; font-weight:600; margin:0; color:var(--ink); }
+  a{ color:var(--amber); }
+  code, .mono{ font-family:'JetBrains Mono',monospace; }
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:5rem 1.5rem 4rem;
+    text-align:left;
+    max-width:820px;
+    margin:0 auto;
+    position:relative;
+  }
+  .hero .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--amber);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    margin-bottom:1rem;
+    display:block;
+  }
+  .hero h1{ font-size:clamp(2.2rem,5vw,3.4rem); line-height:1.08; letter-spacing:-0.01em; }
+  .hero h1 em{ font-style:italic; color:var(--amber); }
+  .hero p.lede{
+    font-size:1.15rem;
+    color:var(--ink-soft);
+    max-width:600px;
+    margin-top:1.4rem;
+  }
+  .shelf{
+    margin-top:3rem;
+    border:1px solid var(--line-strong);
+    border-radius:4px;
+    background:var(--paper-raised);
+    padding:1.5rem;
+  }
+  .shelf-label{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-mute); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.8rem;}
+
+  /* ===== TOC ===== */
+  .toc-wrap{ max-width:820px; margin:0 auto; padding:0 1.5rem 3rem; }
+  .toc{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .toc a{
+    background:var(--paper-raised);
+    padding:0.9rem 1rem;
+    text-decoration:none;
+    color:var(--ink);
+    font-size:14px;
+    display:flex;
+    gap:0.6rem;
+    align-items:baseline;
+    transition:background 0.15s ease;
+  }
+  .toc a:hover{ background:var(--amber-bg); }
+  .toc .n{ font-family:'JetBrains Mono',monospace; color:var(--amber); font-size:12px; min-width:20px; }
+
+  /* ===== SECTION ===== */
+  .section{
+    max-width:820px;
+    margin:0 auto;
+    padding:3.5rem 1.5rem;
+    border-top:1px solid var(--line);
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:1rem;
+    margin-bottom:0.4rem;
+  }
+  .section-num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--amber);
+    font-size:14px;
+  }
+  .section h2{ font-size:1.8rem; }
+  .tagline{ color:var(--ink-soft); font-size:1.02rem; margin:0.6rem 0 1.8rem; max-width:600px;}
+
+  .diagram-box{
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+    border-radius:6px;
+    padding:1.5rem;
+    margin:1.5rem 0;
+    overflow-x:auto;
+  }
+  .diagram-caption{ font-size:13px; color:var(--ink-mute); margin-top:0.8rem; font-family:'JetBrains Mono',monospace;}
+
+  .callout{
+    border-left:3px solid var(--teal);
+    background:var(--teal-bg);
+    padding:1rem 1.2rem;
+    border-radius:0 4px 4px 0;
+    margin:1.5rem 0;
+  }
+  .callout.warn{ border-left-color:var(--coral); background:var(--coral-bg); }
+  .callout .label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--teal);
+    display:block;
+    margin-bottom:0.4rem;
+  }
+  .callout.warn .label{ color:var(--coral); }
+  .callout p{ margin:0; color:var(--ink); font-size:14.5px; }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:1.5rem 0; }
+  @media (max-width:640px){ .two-col{ grid-template-columns:1fr; } }
+  .mini-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:1rem 1.2rem;
+  }
+  .mini-card .h{ font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-mute); margin-bottom:0.5rem;}
+  .mini-card p{ margin:0; font-size:14.5px; }
+
+  table{ width:100%; border-collapse:collapse; margin:1.2rem 0; font-size:14px; }
+  th,td{ text-align:left; padding:0.55rem 0.8rem; border-bottom:1px solid var(--line); }
+  th{ font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-mute); font-weight:500; }
+  td.op{ font-family:'JetBrains Mono',monospace; }
+  td.good{ color:var(--teal); font-weight:500; }
+  td.bad{ color:var(--coral); font-weight:500; }
+
+  pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:1.1rem 1.3rem;
+    border-radius:6px;
+    overflow-x:auto;
+    font-size:13.5px;
+    line-height:1.6;
+    margin:1.2rem 0;
+  }
+  pre .c1{ color:#7C88A6; }
+  pre .kw{ color:var(--code-key); }
+  pre .st{ color:var(--code-str); }
+
+  .analogy{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:1.15rem;
+    color:var(--ink-soft);
+    border-left:3px solid var(--amber);
+    padding-left:1rem;
+    margin:1.5rem 0;
+  }
+
+  /* ===== decision section ===== */
+  .decision{ background:var(--ink); color:var(--paper); padding:4rem 1.5rem; }
+  .decision-inner{ max-width:820px; margin:0 auto; }
+  .decision h2{ color:var(--paper); font-size:1.9rem; }
+  .decision .tagline{ color:#A9AFC4; }
+  .steps{ counter-reset:step; margin:2rem 0; }
+  .step{
+    display:flex; gap:1rem; padding:1rem 0; border-top:1px solid #333C5C;
+  }
+  .step:last-child{ border-bottom:1px solid #333C5C; }
+  .step .num{
+    font-family:'JetBrains Mono',monospace; color:var(--amber);
+    font-size:1.1rem; min-width:24px;
+  }
+  .step .q{ font-weight:500; }
+  .step .a{ color:#A9AFC4; font-size:14px; margin-top:0.3rem;}
+
+  .matrix{ width:100%; border-collapse:collapse; margin-top:2rem; font-size:13.5px; }
+  .matrix th{ color:var(--amber); border-bottom:1px solid #333C5C; padding:0.7rem 0.6rem; text-align:left; font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase;}
+  .matrix td{ padding:0.7rem 0.6rem; border-bottom:1px solid #262E4A; color:#DCE1F0; }
+  .matrix td.struct{ font-family:'JetBrains Mono',monospace; color:#fff; }
+
+  .site-footer{ background:var(--ink); color:#C7CCDD; padding:3.5rem 1.5rem 0; }
+  .footer-inner{
+    max-width:960px; margin:0 auto;
+    display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:2.5rem;
+    padding-bottom:2.5rem; border-bottom:1px solid #2E3654;
+  }
+  @media (max-width:768px){ .footer-inner{ grid-template-columns:1fr 1fr; } .footer-brand{ grid-column:1 / -1; } }
+  @media (max-width:480px){ .footer-inner{ grid-template-columns:1fr; } }
+  .footer-logo{
+    font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:500; color:#fff;
+    display:flex; align-items:center; gap:0.5rem; margin-bottom:0.9rem;
+  }
+  .footer-logo .dot{ width:7px; height:7px; border-radius:50%; background:var(--amber); display:inline-block; }
+  .footer-brand p{ font-size:13.5px; line-height:1.7; color:#9CA3BC; max-width:380px; margin:0; }
+  .footer-h{ font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#6E77A0; margin-bottom:0.9rem; }
+  .footer-col{ display:flex; flex-direction:column; gap:0.6rem; }
+  .footer-col a{ color:#C7CCDD; text-decoration:none; font-size:14px; transition:color 0.15s ease; }
+  .footer-col a:hover{ color:var(--amber); }
+  .footer-name{ font-size:14px; color:#fff; font-weight:500; }
+  .footer-bottom{
+    max-width:960px; margin:0 auto; padding:1.4rem 0;
+    display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+    font-size:12.5px; color:#6E77A0;
+  }
+
+  ::selection{ background:var(--amber-bg); color:var(--ink); }
+
+  @media (max-width:640px){
+    table{ display:block; overflow-x:auto; white-space:nowrap; }
+  }
+
+  /* ===== QUIZ ===== */
+  .quiz-section{ max-width:820px; margin:0 auto; padding:0 1.5rem 3.5rem; }
+  .quiz-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+    border-radius:8px;
+    padding:1.6rem 1.8rem;
+  }
+  .quiz-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .quiz-progress{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-mute); }
+  .quiz-score{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--amber); }
+  .quiz-q{ font-size:1.1rem; font-weight:500; margin-bottom:1.1rem; font-family:'Fraunces',serif; }
+  .quiz-opts{ display:grid; gap:0.6rem; }
+  .quiz-opt{
+    text-align:left;
+    background:var(--paper);
+    border:1px solid var(--line-strong);
+    border-radius:6px;
+    padding:0.75rem 1rem;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all 0.12s ease;
+  }
+  .quiz-opt:hover{ border-color:var(--amber); background:var(--amber-bg); }
+  .quiz-opt.correct{ border-color:var(--teal); background:var(--teal-bg); color:var(--teal); font-weight:500; }
+  .quiz-opt.incorrect{ border-color:var(--coral); background:var(--coral-bg); color:var(--coral); font-weight:500; }
+  .quiz-opt[disabled]{ cursor:default; }
+  .quiz-explain{ margin-top:1rem; font-size:13.5px; color:var(--ink-soft); background:var(--paper); border-radius:6px; padding:0.8rem 1rem; display:none; }
+  .quiz-next{ margin-top:1.2rem; display:none; }
+  .quiz-done{ text-align:center; padding:1rem 0; }
+  .quiz-done .big{ font-family:'Fraunces',serif; font-size:2.2rem; color:var(--amber); }
+
+  /* ===== DIFFERENCES ===== */
+  .diff-grid{ display:grid; gap:1rem; margin-top:1.5rem; }
+  .diff-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+    border-radius:8px;
+    padding:1.2rem 1.4rem;
+  }
+  .diff-title{ font-family:'Fraunces',serif; font-size:1.15rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.6rem; }
+  .diff-title .vs{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-mute); }
+  .diff-row{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; font-size:14px; }
+  @media (max-width:640px){ .diff-row{ grid-template-columns:1fr; } }
+  .diff-row .side{ padding:0.7rem 0.9rem; border-radius:6px; }
+  .diff-row .side.a{ background:var(--amber-bg); }
+  .diff-row .side.b{ background:var(--teal-bg); }
+  .diff-row .side .h{ font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.35rem; color:var(--ink-soft); }
+
+  /* ===== BIG TABLE ===== */
+  .big-table-wrap{ overflow-x:auto; margin-top:1.5rem; border:1px solid var(--line-strong); border-radius:8px; }
+  table.big-table{ width:100%; min-width:820px; border-collapse:collapse; margin:0; font-size:13px; }
+  table.big-table th{
+    background:var(--ink); color:var(--paper);
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em;
+    padding:0.7rem 0.7rem; text-align:left; position:sticky; top:0;
+  }
+  table.big-table td{ padding:0.65rem 0.7rem; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:12.5px; }
+  table.big-table tr:nth-child(even) td{ background:var(--paper); }
+  table.big-table td.name{ font-family:'Inter',sans-serif; font-weight:500; font-size:13.5px; }
+  table.big-table .avg{ color:var(--teal); }
+  table.big-table .worst{ color:var(--coral); font-size:11px; }
+
+  /* ===== INTERVIEW QUESTIONS ===== */
+  .iq-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-top:1.5rem; }
+  @media (max-width:640px){ .iq-grid{ grid-template-columns:1fr; } }
+  .iq-card{ background:var(--paper-raised); border:1px solid var(--line-strong); border-radius:8px; padding:1.2rem 1.4rem; }
+  .iq-card h3{ font-size:1.05rem; margin-bottom:0.3rem; }
+  .iq-card .sub{ font-size:12.5px; color:var(--ink-mute); margin-bottom:0.9rem; }
+  .iq-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0.55rem; }
+  .iq-list li{ display:flex; justify-content:space-between; align-items:center; gap:0.6rem; font-size:14px; }
+  .badge{ font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; padding:0.2rem 0.5rem; border-radius:3px; white-space:nowrap; }
+  .badge.easy{ background:var(--teal-bg); color:var(--teal); }
+  .badge.med{ background:var(--amber-bg); color:var(--amber); }
+  .badge.hard{ background:var(--coral-bg); color:var(--coral); }
+
+  /* ===== STICKY NAV ===== */
+  html{ scroll-padding-top:76px; }
+  body{ padding-top:60px; }
+  .topnav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    height:60px;
+    display:flex; align-items:center;
+    background:rgba(250,249,244,0.72);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    transition:box-shadow 0.25s ease;
+  }
+  .topnav.scrolled{ box-shadow:0 2px 18px rgba(28,37,65,0.06); }
+  .topnav-inner{
+    max-width:1080px; width:100%; margin:0 auto;
+    display:flex; align-items:center; gap:1.5rem;
+    padding:0 1.5rem;
+  }
+  .topnav-brand{
+    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:500;
+    color:var(--ink); white-space:nowrap; text-decoration:none;
+    display:flex; align-items:center; gap:0.4rem;
+  }
+  .topnav-brand .dot{ width:7px; height:7px; border-radius:50%; background:var(--amber); display:inline-block; }
+  .topnav-links{
+    display:flex; gap:0.3rem; overflow-x:auto; scrollbar-width:none;
+    -ms-overflow-style:none; flex:1;
+  }
+  .topnav-links::-webkit-scrollbar{ display:none; }
+  .topnav-links a{
+    font-size:13px; color:var(--ink-soft); text-decoration:none;
+    white-space:nowrap; padding:0.4rem 0.7rem; border-radius:20px;
+    transition:all 0.15s ease;
+  }
+  .topnav-links a:hover{ color:var(--ink); background:var(--amber-bg); }
+  .topnav-links a.active{ color:var(--amber); background:var(--amber-bg); font-weight:500; }
+  @media (max-width:768px){
+    .topnav-brand{ display:none; }
+    .topnav-inner{ padding:0 1rem; }
+  }
+
+  /* ===== LEFT SIDEBAR NAV (wide screens) ===== */
+  .sidenav{
+    display:none;
+    position:fixed; top:0; left:0; bottom:0; width:248px; z-index:100;
+    background:var(--paper-raised);
+    border-right:1px solid var(--line);
+    padding:1.6rem 0 1.4rem;
+    overflow-y:auto;
+  }
+  .sidenav-brand{
+    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:500;
+    color:var(--ink); text-decoration:none;
+    display:flex; align-items:center; gap:0.5rem;
+    padding:0 1.6rem; margin-bottom:1.5rem;
+  }
+  .sidenav-brand .dot{ width:7px; height:7px; border-radius:50%; background:var(--amber); display:inline-block; }
+  .sidenav-scroll{ display:flex; flex-direction:column; }
+  .sidenav-group-label{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--ink-mute); padding:1rem 1.6rem 0.4rem;
+  }
+  .sidenav a{
+    font-size:14px; color:var(--ink-soft); text-decoration:none;
+    padding:0.5rem 1.6rem; border-left:2px solid transparent;
+    transition:all 0.15s ease;
+  }
+  .sidenav a:hover{ color:var(--ink); background:var(--amber-bg); }
+  .sidenav a.active{ color:var(--amber); border-left-color:var(--amber); background:var(--amber-bg); font-weight:500; }
+
+  @media (min-width:961px){
+    .topnav{ display:none; }
+    .sidenav{ display:block; }
+    html{ scroll-padding-top:24px; }
+    body{ padding-top:0; margin-left:248px; }
+  }
+
+  /* ===== SIDEBAR NAV (wide screens) — clearer than a crowded top bar ===== */
+  @media (min-width:960px){
+    html{ scroll-padding-top:24px; }
+    body{ padding-top:0; padding-left:236px; }
+    .topnav{
+      top:0; left:0; right:auto; bottom:0;
+      width:236px; height:100vh;
+      border-bottom:none; border-right:1px solid var(--line);
+      background:rgba(250,249,244,0.9);
+    }
+    .topnav.scrolled{ box-shadow:2px 0 18px rgba(28,37,65,0.05); }
+    .topnav-inner{
+      flex-direction:column; align-items:flex-start;
+      max-width:none; width:100%; height:100%;
+      padding:1.6rem 1.1rem; gap:0;
+    }
+    .topnav-brand{
+      display:flex; font-size:14px; padding-bottom:1.2rem;
+      margin-bottom:1rem; border-bottom:1px solid var(--line); width:100%;
+    }
+    .topnav-links{
+      flex-direction:column; overflow-x:visible; overflow-y:auto;
+      width:100%; gap:0.1rem; flex:1;
+    }
+    .topnav-links a{
+      width:100%; border-radius:6px; padding:0.55rem 0.7rem;
+      border-left:2px solid transparent;
+    }
+    .topnav-links a.active{ border-left:2px solid var(--amber); border-radius:0 6px 6px 0; }
+  }
+
+  /* ===== SCROLL REVEAL ===== */
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion:reduce){
+    .reveal{ opacity:1; transform:none; transition:none; }
+  }
+
+  /* ===== RESOURCES ===== */
+  .res-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1.5rem; }
+  @media (max-width:768px){ .res-grid{ grid-template-columns:1fr; } }
+  .res-card{
+    background:var(--paper-raised); border:1px solid var(--line-strong); border-radius:10px;
+    padding:1.3rem 1.4rem; text-decoration:none; color:var(--ink); display:block;
+    transition:border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .res-card:hover{ border-color:var(--amber); transform:translateY(-2px); box-shadow:0 10px 26px rgba(28,37,65,0.08); }
+  .res-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:0.6rem; margin-bottom:0.5rem; }
+  .res-card h3{ font-size:1.05rem; margin:0; }
+  .res-tag{ font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; padding:0.2rem 0.5rem; border-radius:3px; white-space:nowrap; background:var(--teal-bg); color:var(--teal); }
+  .res-tag.paid{ background:var(--coral-bg); color:var(--coral); }
+  .res-card p{ margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .res-url{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-mute); margin-top:0.7rem; display:block; }
+
+  /* ===== RESPONSIVE POLISH ===== */
+  @media (max-width:1024px){
+    .hero{ padding:4rem 1.5rem 3rem; }
+  }
+  @media (max-width:480px){
+    body{ font-size:15px; }
+    .section{ padding:2.6rem 1.2rem; }
+    .section h2{ font-size:1.5rem; }
+    pre{ font-size:12.5px; padding:0.9rem 1rem; }
+    .quiz-card{ padding:1.2rem 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <a href="#" class="topnav-brand"><span class="dot"></span>DS Manual</a>
+    <div class="topnav-links" id="topnavLinks"></div>
+  </div>
+</nav>
+
+<aside class="sidenav" id="sidenav">
+  <a href="#" class="sidenav-brand"><span class="dot"></span>DS Manual</a>
+  <div class="sidenav-scroll" id="sidenavLinks"></div>
+</aside>
+
+<div class="hero grid-bg">
+  <span class="eyebrow">Zero to fluent · 12 structures</span>
+  <h1>Data structures,<br>explained like <em>you've never seen one.</em></h1>
+  <p class="lede">Every data structure is just an answer to one question: <strong>how should this data sit in memory so the operations I need are fast?</strong> Learn that reasoning, not the syntax, and you'll never forget which one to reach for.</p>
+
+  <div class="shelf">
+    <div class="shelf-label">the one idea underneath everything below</div>
+    <p style="margin:0; font-size:15px; color:var(--ink-soft);">
+      Imagine memory as a long street of numbered mailboxes. An <strong>array</strong> is renting a contiguous block of boxes and knowing the street numbers — so you can walk straight to box #47. A <strong>linked list</strong> is scattering boxes anywhere in the city, each one leaving a note with the next box's address — cheap to add a box anywhere, but you must follow the trail box-by-box to find #47. Almost every trade-off you'll read below is a variation of this one tension: <em>contiguous and numbered</em> (fast lookup, slow insert) versus <em>scattered and linked</em> (slow lookup, fast insert).
+    </p>
+  </div>
+</div>
+
+<div class="toc-wrap">
+  <div class="toc" id="toc"></div>
+</div>
+
+<!-- ============ QUIZ ============ -->
+<div class="quiz-section reveal">
+  <div class="section-head" style="margin-bottom:0.4rem;"><span class="section-num">test</span><h2 style="font-size:1.6rem;">Quick check — before you read on</h2></div>
+  <p class="tagline">12 questions, one per structure below. Guess first, then read — wrong guesses are how the trade-offs actually stick.</p>
+  <div class="quiz-card">
+    <div class="quiz-top">
+      <span class="quiz-progress" id="qProgress">Question 1 of 12</span>
+      <span class="quiz-score" id="qScore">Score: 0</span>
+    </div>
+    <div class="quiz-q" id="qText"></div>
+    <div class="quiz-opts" id="qOpts"></div>
+    <div class="quiz-explain" id="qExplain"></div>
+    <button class="quiz-next" id="qNext">Next question →</button>
+    <div class="quiz-done" id="qDone" style="display:none;">
+      <div class="big" id="qFinalScore"></div>
+      <p style="color:var(--ink-soft); margin:0.5rem 0 1.2rem;">Whatever you missed, that section below is worth reading twice.</p>
+      <button class="quiz-next" style="display:inline-block;" id="qRestart">Try again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 1. ARRAY ============ -->
+<section class="section reveal" id="array">
+  <div class="section-head"><span class="section-num">01</span><h2>Array</h2></div>
+  <p class="tagline">A fixed row of memory slots, numbered from 0, where any slot can be reached instantly.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 640 140" width="100%" style="max-width:640px;">
+      <text x="0" y="20" font-family="JetBrains Mono" font-size="12" fill="#8B8F9C">memory address grows →</text>
+      <g font-family="JetBrains Mono" font-size="14">
+        <!-- boxes -->
+        <g transform="translate(0,40)">
+          <rect x="0" y="0" width="76" height="50" fill="#F5E9D3" stroke="#A8721E" stroke-width="1.5"/>
+          <text x="38" y="31" text-anchor="middle" fill="#1C2541" font-weight="500">12</text>
+          <text x="38" y="68" text-anchor="middle" fill="#8B8F9C" font-size="12">index 0</text>
+        </g>
+        <g transform="translate(90,40)">
+          <rect x="0" y="0" width="76" height="50" fill="#F5E9D3" stroke="#A8721E" stroke-width="1.5"/>
+          <text x="38" y="31" text-anchor="middle" fill="#1C2541" font-weight="500">7</text>
+          <text x="38" y="68" text-anchor="middle" fill="#8B8F9C" font-size="12">index 1</text>
+        </g>
+        <g transform="translate(180,40)">
+          <rect x="0" y="0" width="76" height="50" fill="#F5E9D3" stroke="#A8721E" stroke-width="1.5"/>
+          <text x="38" y="31" text-anchor="middle" fill="#1C2541" font-weight="500">45</text>
+          <text x="38" y="68" text-anchor="middle" fill="#8B8F9C" font-size="12">index 2</text>
+        </g>
+        <g transform="translate(270,40)">
+          <rect x="0" y="0" width="76" height="50" fill="#F5E9D3" stroke="#A8721E" stroke-width="1.5"/>
+          <text x="38" y="31" text-anchor="middle" fill="#1C2541" font-weight="500">3</text>
+          <text x="38" y="68" text-anchor="middle" fill="#8B8F9C" font-size="12">index 3</text>
+        </g>
+        <g transform="translate(360,40)">
+          <rect x="0" y="0" width="76" height="50" fill="#F5E9D3" stroke="#A8721E" stroke-width="1.5"/>
+          <text x="38" y="31" text-anchor="middle" fill="#1C2541" font-weight="500">89</text>
+          <text x="38" y="68" text-anchor="middle" fill="#8B8F9C" font-size="12">index 4</text>
+        </g>
+      </g>
+      <path d="M 218 20 L 218 38" stroke="#A6432A" stroke-width="1.5" marker-end="url(#arr1)"/>
+      <text x="218" y="14" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#A6432A">arr[2] → jumps straight here</text>
+      <defs><marker id="arr1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A6432A"/></marker></defs>
+    </svg>
+    <p class="diagram-caption">arr[2] doesn't search — it computes base_address + 2×slot_size and lands exactly there.</p>
+  </div>
+
+  <p class="analogy">Think of it as a row of numbered parking spots. If you know a car is in spot 12, you drive straight there — you never scan spot 1, 2, 3... to find it.</p>
+
+  <div class="two-col">
+    <div class="mini-card"><div class="h">Why it's fast</div><p>The address of any index is pure arithmetic — no searching. That's what makes lookup O(1).</p></div>
+    <div class="mini-card"><div class="h">Why it's rigid</div><p>The slots are contiguous, so the size is fixed at creation. Inserting in the middle means physically shifting every element after it.</p></div>
+  </div>
+
+  <table>
+    <tr><th>Operation</th><th>Time</th><th>Why</th></tr>
+    <tr><td class="op">Access by index</td><td class="op good">O(1)</td><td>direct address math</td></tr>
+    <tr><td class="op">Search (unsorted)</td><td class="op bad">O(n)</td><td>must check each slot</td></tr>
+    <tr><td class="op">Insert / delete at end</td><td class="op good">O(1)</td><td>no shifting needed</td></tr>
+    <tr><td class="op">Insert / delete in middle</td><td class="op bad">O(n)</td><td>everything after must shift</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>You know the size upfront (or close to it), you need instant access by position, and changes mostly happen at the end. Pixel grids, lookup tables, fixed-size buffers, coordinates.</p>
+  </div>
+</section>
+
+<!-- ============ 2. DYNAMIC ARRAY ============ -->
+<section class="section reveal" id="dynamic-array">
+  <div class="section-head"><span class="section-num">02</span><h2>Dynamic array</h2></div>
+  <p class="tagline">An array that secretly outgrows itself — Python's <code>list</code>, Java's <code>ArrayList</code>, JS's <code>Array</code>.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 640 160" width="100%" style="max-width:640px;">
+      <g font-family="JetBrains Mono" font-size="12">
+        <text x="0" y="16" fill="#8B8F9C">capacity 4, full</text>
+        <rect x="0" y="24" width="52" height="40" fill="#DFEEE9" stroke="#296B5C"/>
+        <rect x="52" y="24" width="52" height="40" fill="#DFEEE9" stroke="#296B5C"/>
+        <rect x="104" y="24" width="52" height="40" fill="#DFEEE9" stroke="#296B5C"/>
+        <rect x="156" y="24" width="52" height="40" fill="#DFEEE9" stroke="#296B5C"/>
+
+        <text x="240" y="50" fill="#A6432A">append() →</text>
+
+        <text x="340" y="16" fill="#8B8F9C">reallocates to capacity 8, copies all, then adds</text>
+        <rect x="340" y="24" width="34" height="40" fill="#F5E9D3" stroke="#A8721E"/>
+        <rect x="374" y="24" width="34" height="40" fill="#F5E9D3" stroke="#A8721E"/>
+        <rect x="408" y="24" width="34" height="40" fill="#F5E9D3" stroke="#A8721E"/>
+        <rect x="442" y="24" width="34" height="40" fill="#F5E9D3" stroke="#A8721E"/>
+        <rect x="476" y="24" width="34" height="40" fill="#A8721E" stroke="#A8721E"/>
+        <rect x="510" y="24" width="34" height="40" fill="#fff" stroke="#DEDACE" stroke-dasharray="3,2"/>
+        <rect x="544" y="24" width="34" height="40" fill="#fff" stroke="#DEDACE" stroke-dasharray="3,2"/>
+        <rect x="578" y="24" width="34" height="40" fill="#fff" stroke="#DEDACE" stroke-dasharray="3,2"/>
+        <text x="493" y="90" fill="#A8721E" text-anchor="middle">new item</text>
+        <text x="510" y="110" fill="#8B8F9C" font-size="11" text-anchor="middle">3 empty slots</text>
+        <text x="510" y="124" fill="#8B8F9C" font-size="11" text-anchor="middle">reserved for next appends</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">This resize happens rarely — capacity doubles each time — so the average cost per append stays O(1).</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">The subtlety</span>
+    <p>Most appends are O(1). But whenever the backing array fills up, one append silently costs O(n) — it must allocate a bigger block and copy everything over. Averaged across many appends, this still works out to O(1) "amortized" — but if you're timing a single operation and it's mysteriously slow, this is why.</p>
+  </div>
+
+  <table>
+    <tr><th>Operation</th><th>Time</th></tr>
+    <tr><td class="op">Access by index</td><td class="op good">O(1)</td></tr>
+    <tr><td class="op">Append at end</td><td class="op good">O(1) amortized</td></tr>
+    <tr><td class="op">Insert / delete at front or middle</td><td class="op bad">O(n)</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>This is your default "just give me a list" structure — reach for it first unless something specific (frequent front-insertion, key-based lookup) points elsewhere.</p>
+  </div>
+</section>
+
+<!-- ============ 3. STRING ============ -->
+<section class="section reveal" id="string">
+  <div class="section-head"><span class="section-num">03</span><h2>String</h2></div>
+  <p class="tagline">A read-only array of characters. Behaves like an array — with one dangerous exception.</p>
+
+  <div class="callout warn">
+    <span class="label">The trap</span>
+    <p>Strings are <strong>immutable</strong>. Every "modification" — concatenation, slicing — actually builds a brand-new string in memory. Doing <code>result += char</code> inside a loop of n characters costs O(n) each time, O(n²) total. This is one of the most common silent performance bugs beginners write.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="mini-card"><div class="h">Slow — O(n²)</div>
+      <pre style="margin:0;"><span class="kw">result</span> = <span class="st">""</span>
+<span class="kw">for</span> ch <span class="kw">in</span> text:
+    result += ch  <span class="c1"># new string each time</span></pre>
+    </div>
+    <div class="mini-card"><div class="h">Fast — O(n)</div>
+      <pre style="margin:0;"><span class="kw">parts</span> = []
+<span class="kw">for</span> ch <span class="kw">in</span> text:
+    parts.append(ch)
+result = <span class="st">""</span>.join(parts)</pre>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Representing text, obviously — but build long strings with a list + join, or a mutable buffer (StringBuilder in Java), never with repeated concatenation in a loop.</p>
+  </div>
+</section>
+
+<!-- ============ 4. LINKED LIST ============ -->
+<section class="section reveal" id="linked-list">
+  <div class="section-head"><span class="section-num">04</span><h2>Linked list</h2></div>
+  <p class="tagline">Nodes scattered anywhere in memory, each one holding data plus a pointer to the next node.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 640 120" width="100%" style="max-width:640px;">
+      <defs><marker id="arrLL" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1C2541"/></marker></defs>
+      <g font-family="JetBrains Mono" font-size="13">
+        <g transform="translate(20,30)">
+          <rect width="90" height="45" fill="#fff" stroke="#1C2541" stroke-width="1.5"/>
+          <line x1="60" y1="0" x2="60" y2="45" stroke="#1C2541"/>
+          <text x="30" y="28" text-anchor="middle">12</text>
+          <text x="75" y="28" text-anchor="middle" fill="#8B8F9C" font-size="16">•</text>
+        </g>
+        <path d="M112 52 L 195 52" stroke="#1C2541" stroke-width="1.5" marker-end="url(#arrLL)"/>
+
+        <g transform="translate(200,30)">
+          <rect width="90" height="45" fill="#fff" stroke="#1C2541" stroke-width="1.5"/>
+          <line x1="60" y1="0" x2="60" y2="45" stroke="#1C2541"/>
+          <text x="30" y="28" text-anchor="middle">45</text>
+          <text x="75" y="28" text-anchor="middle" fill="#8B8F9C" font-size="16">•</text>
+        </g>
+        <path d="M292 52 L 375 52" stroke="#1C2541" stroke-width="1.5" marker-end="url(#arrLL)"/>
+
+        <g transform="translate(380,30)">
+          <rect width="90" height="45" fill="#fff" stroke="#1C2541" stroke-width="1.5"/>
+          <line x1="60" y1="0" x2="60" y2="45" stroke="#1C2541"/>
+          <text x="30" y="28" text-anchor="middle">7</text>
+          <text x="75" y="28" text-anchor="middle" fill="#8B8F9C" font-size="16">•</text>
+        </g>
+        <path d="M472 52 L 540 52" stroke="#1C2541" stroke-width="1.5" marker-end="url(#arrLL)"/>
+        <text x="565" y="57" fill="#8B8F9C">null</text>
+      </g>
+      <text x="20" y="95" font-family="JetBrains Mono" font-size="11" fill="#8B8F9C">these three nodes could be at completely unrelated memory addresses — only the pointers connect them</text>
+    </svg>
+  </div>
+
+  <p class="analogy">Like a scavenger hunt: each clue (node) is hidden somewhere different, but tells you exactly where to find the next one. You can't jump straight to clue #5 — you must follow the trail from clue #1.</p>
+
+  <table>
+    <tr><th>Operation</th><th>Time</th><th>Why</th></tr>
+    <tr><td class="op">Insert / delete at a known node</td><td class="op good">O(1)</td><td>just rewire pointers, nothing shifts</td></tr>
+    <tr><td class="op">Access by index / search</td><td class="op bad">O(n)</td><td>must walk node-by-node from the head</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="label">Also worth knowing</span>
+    <p>Because nodes live at scattered addresses, linked lists have worse CPU cache performance than arrays even when both are "O(n)" — in practice arrays are often faster for pure iteration.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Frequent insertions/deletions, especially at the front, and you don't need index-based access. Building blocks for stacks, queues, and the classic LRU cache (paired with a hash map).</p>
+  </div>
+</section>
+
+<!-- ============ 5. STACK ============ -->
+<section class="section reveal" id="stack">
+  <div class="section-head"><span class="section-num">05</span><h2>Stack — LIFO</h2></div>
+  <p class="tagline">Last in, first out. You only ever touch the top.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 500 180" width="100%" style="max-width:420px;">
+      <g font-family="JetBrains Mono" font-size="13">
+        <rect x="40" y="110" width="120" height="34" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="100" y="132" text-anchor="middle">bottom: A</text>
+        <rect x="40" y="76" width="120" height="34" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="100" y="98" text-anchor="middle">B</text>
+        <rect x="40" y="42" width="120" height="34" fill="#A8721E"/>
+        <text x="100" y="64" text-anchor="middle" fill="#fff">top: C</text>
+        <path d="M100 10 L 100 40" stroke="#A6432A" stroke-width="1.5" marker-end="url(#arrS)"/>
+        <text x="100" y="6" text-anchor="middle" fill="#A6432A" font-size="12">push/pop only here</text>
+      </g>
+      <defs><marker id="arrS" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A6432A"/></marker></defs>
+    </svg>
+    <p class="diagram-caption">Pancake stack: you always eat (pop) the top one, and add (push) a new one on top.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>You see "undo," "matching/nesting," "next greater element," or you're doing DFS iteratively. Note: recursion itself uses a stack — that's literally what the "call stack" is, which is why deep recursion can overflow it.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">Trigger phrase to watch for</span>
+    <p>Balanced parentheses / brackets, browser back-button history, expression evaluation — anywhere the most recent unresolved thing needs to be resolved first.</p>
+  </div>
+</section>
+
+<!-- ============ 6. QUEUE & DEQUE ============ -->
+<section class="section reveal" id="queue">
+  <div class="section-head"><span class="section-num">06</span><h2>Queue &amp; deque — FIFO</h2></div>
+  <p class="tagline">First in, first out. Add at the back, remove from the front. A deque does both ends.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 560 110" width="100%" style="max-width:520px;">
+      <g font-family="JetBrains Mono" font-size="13">
+        <text x="0" y="20" fill="#8B8F9C" font-size="12">remove ←</text>
+        <rect x="0" y="30" width="70" height="40" fill="#A8721E"/>
+        <text x="35" y="55" text-anchor="middle" fill="#fff">A</text>
+        <rect x="80" y="30" width="70" height="40" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="115" y="55" text-anchor="middle">B</text>
+        <rect x="160" y="30" width="70" height="40" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="195" y="55" text-anchor="middle">C</text>
+        <rect x="240" y="30" width="70" height="40" fill="#fff" stroke="#DEDACE" stroke-dasharray="3,2"/>
+        <text x="280" y="20" fill="#8B8F9C" font-size="12">→ add</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">Whoever joined the line first (A) leaves first — exactly like a queue at a checkout counter.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Why it matters</span>
+    <p>This ordering is exactly what BFS needs: to guarantee you find the <em>shortest</em> path, you must explore nodes in the order you discovered them — one queue does that automatically.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>"Process in arrival order," task scheduling, BFS / level-order traversal, sliding-window maximum (deque tracks candidates from both ends).</p>
+  </div>
+</section>
+
+<!-- ============ 7. HASH MAP ============ -->
+<section class="section reveal" id="hash-map">
+  <div class="section-head"><span class="section-num">07</span><h2>Hash map &amp; hash set</h2></div>
+  <p class="tagline">The single most useful structure in interviews. Average O(1) lookup by key.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 620 150" width="100%" style="max-width:600px;">
+      <g font-family="JetBrains Mono" font-size="13">
+        <rect x="0" y="10" width="130" height="34" fill="#fff" stroke="#1C2541"/>
+        <text x="65" y="32" text-anchor="middle">"apple"</text>
+        <text x="150" y="32" fill="#8B8F9C">hash() ⟶</text>
+        <text x="240" y="32" fill="#A6432A">7</text>
+        <path d="M260 27 L 320 27" stroke="#A6432A" stroke-width="1.5" marker-end="url(#arrH)"/>
+
+        <text x="330" y="0" font-size="11" fill="#8B8F9C">bucket array</text>
+        <g transform="translate(330,10)">
+          <rect x="0" y="0" width="42" height="34" fill="#fff" stroke="#DEDACE"/>
+          <rect x="42" y="0" width="42" height="34" fill="#fff" stroke="#DEDACE"/>
+          <rect x="84" y="0" width="42" height="34" fill="#fff" stroke="#DEDACE"/>
+          <rect x="126" y="0" width="42" height="34" fill="#fff" stroke="#DEDACE"/>
+          <rect x="168" y="0" width="42" height="34" fill="#fff" stroke="#DEDACE"/>
+          <rect x="210" y="0" width="42" height="34" fill="#A8721E"/>
+          <text x="231" y="23" text-anchor="middle" fill="#fff" font-size="12">apple</text>
+          <rect x="252" y="0" width="42" height="34" fill="#fff" stroke="#DEDACE"/>
+          <text x="0" y="50" font-size="10" fill="#8B8F9C">0</text>
+          <text x="231" y="50" font-size="10" fill="#A6432A" text-anchor="middle">7</text>
+        </g>
+      </g>
+      <defs><marker id="arrH" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#A6432A"/></marker></defs>
+      <text x="0" y="95" font-family="JetBrains Mono" font-size="12" fill="#8B8F9C">a hash function turns any key into a bucket number — no scanning required to find it again</text>
+    </svg>
+  </div>
+
+  <div class="callout">
+    <span class="label">The instinct that should trigger this</span>
+    <p>The moment you catch yourself thinking <em>"I'll loop through to find or count it"</em> — stop. A hash map turns that O(n) scan into an O(1) lookup. This single realization solves a huge share of array and string interview problems.</p>
+  </div>
+
+  <table>
+    <tr><th>Operation</th><th>Average</th><th>Worst case</th></tr>
+    <tr><td class="op">Insert / lookup / delete</td><td class="op good">O(1)</td><td class="op bad">O(n) — rare, adversarial collisions</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="label">Trade-off</span>
+    <p>No ordering is preserved (unless you use an ordered variant). If you need sorted iteration, a hash map alone won't give it to you.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Counting, deduplication, "have I seen this," fast complement lookups (Two Sum), caching results you've already computed.</p>
+  </div>
+</section>
+
+<!-- ============ 8. HEAP ============ -->
+<section class="section reveal" id="heap">
+  <div class="section-head"><span class="section-num">08</span><h2>Heap / priority queue</h2></div>
+  <p class="tagline">Always hands you the smallest (or largest) item, without fully sorting everything else.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 400 170" width="100%" style="max-width:360px;">
+      <defs><marker id="arrT" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#1C2541"/></marker></defs>
+      <g font-family="JetBrains Mono" font-size="13">
+        <circle cx="200" cy="30" r="24" fill="#A8721E"/>
+        <text x="200" y="35" text-anchor="middle" fill="#fff">2</text>
+        <line x1="180" y1="48" x2="120" y2="85" stroke="#1C2541"/>
+        <line x1="220" y1="48" x2="280" y2="85" stroke="#1C2541"/>
+        <circle cx="120" cy="100" r="22" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="120" y="105" text-anchor="middle">5</text>
+        <circle cx="280" cy="100" r="22" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="280" y="105" text-anchor="middle">4</text>
+        <line x1="106" y1="118" x2="70" y2="150" stroke="#1C2541"/>
+        <line x1="134" y1="118" x2="170" y2="150" stroke="#1C2541"/>
+        <circle cx="70" cy="160" r="18" fill="#fff" stroke="#DEDACE"/>
+        <text x="70" y="165" text-anchor="middle" font-size="12">9</text>
+        <circle cx="170" cy="160" r="18" fill="#fff" stroke="#DEDACE"/>
+        <text x="170" y="165" text-anchor="middle" font-size="12">7</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">min-heap: every parent is ≤ its children, so the smallest value is always sitting at the root, ready in O(1).</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>You only ever need "the current smallest/largest," not full sorted order — Dijkstra's algorithm, top-K elements, merging K sorted lists, running median (with two heaps).</p>
+  </div>
+
+  <table>
+    <tr><th>Operation</th><th>Time</th></tr>
+    <tr><td class="op">Peek min/max</td><td class="op good">O(1)</td></tr>
+    <tr><td class="op">Insert / remove</td><td class="op good">O(log n)</td></tr>
+    <tr><td class="op">Build heap from n items</td><td class="op good">O(n)</td></tr>
+  </table>
+</section>
+
+<!-- ============ 9. TREE / BST ============ -->
+<section class="section reveal" id="tree">
+  <div class="section-head"><span class="section-num">09</span><h2>Tree &amp; binary search tree</h2></div>
+  <p class="tagline">Hierarchical nodes with children. A BST additionally keeps left &lt; node &lt; right.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 400 170" width="100%" style="max-width:360px;">
+      <g font-family="JetBrains Mono" font-size="13">
+        <circle cx="200" cy="30" r="24" fill="#296B5C"/>
+        <text x="200" y="35" text-anchor="middle" fill="#fff">8</text>
+        <line x1="185" y1="48" x2="130" y2="85" stroke="#1C2541"/>
+        <line x1="215" y1="48" x2="270" y2="85" stroke="#1C2541"/>
+        <circle cx="130" cy="100" r="22" fill="#DFEEE9" stroke="#296B5C"/>
+        <text x="130" y="105" text-anchor="middle">3</text>
+        <text x="130" y="132" text-anchor="middle" font-size="11" fill="#8B8F9C">&lt; 8</text>
+        <circle cx="270" cy="100" r="22" fill="#DFEEE9" stroke="#296B5C"/>
+        <text x="270" y="105" text-anchor="middle">12</text>
+        <text x="270" y="132" text-anchor="middle" font-size="11" fill="#8B8F9C">&gt; 8</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">To find 12: start at 8, go right (12&gt;8), found it in 2 hops instead of scanning every node.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">The catch</span>
+    <p>O(log n) only holds if the tree is <strong>balanced</strong>. Insert sorted data into a plain BST and it degenerates into a straight line — effectively a linked list, O(n). Self-balancing variants (AVL, Red-Black trees) guarantee balance automatically.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Data is naturally hierarchical (file systems, org charts), or you need both fast search <em>and</em> sorted-order traversal at once — something arrays and hash maps can't both give you together.</p>
+  </div>
+</section>
+
+<!-- ============ 10. TRIE ============ -->
+<section class="section reveal" id="trie">
+  <div class="section-head"><span class="section-num">10</span><h2>Trie — prefix tree</h2></div>
+  <p class="tagline">A tree of characters, built so every path from the root spells out a stored word.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 420 160" width="100%" style="max-width:400px;">
+      <g stroke="#1C2541" stroke-width="1.3">
+        <line x1="52" y1="30" x2="110" y2="30"/>
+        <line x1="146" y1="30" x2="200" y2="30"/>
+        <line x1="232" y1="22" x2="272" y2="65"/>
+        <line x1="232" y1="38" x2="272" y2="115"/>
+      </g>
+      <g font-family="JetBrains Mono" font-size="13">
+        <circle cx="40" cy="30" r="16" fill="#1C2541"/>
+        <text x="40" y="35" text-anchor="middle" fill="#fff" font-size="11">•</text>
+        <circle cx="130" cy="30" r="16" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="130" y="35" text-anchor="middle">c</text>
+        <circle cx="220" cy="30" r="16" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="220" y="35" text-anchor="middle">a</text>
+        <circle cx="290" cy="65" r="16" fill="#DFEEE9" stroke="#296B5C"/>
+        <text x="290" y="70" text-anchor="middle">r</text>
+        <text x="330" y="70" text-anchor="middle" font-size="11" fill="#8B8F9C">end: "car"</text>
+        <circle cx="290" cy="120" r="16" fill="#A8721E"/>
+        <text x="290" y="125" text-anchor="middle" fill="#fff">t</text>
+        <text x="330" y="125" text-anchor="middle" font-size="11" fill="#8B8F9C">end: "cat"</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">"cat" and "car" share the c→a path — the trie stores that shared prefix only once.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Why not just a hash set of words?</span>
+    <p>A hash set answers "is this exact word present" in O(1) — but can't efficiently answer "give me every word starting with 'ca'." A trie answers that in O(L), where L is just the prefix length, no matter how many thousand words are stored.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Autocomplete, spell-check, IP routing tables — anywhere the trigger words are "starts with" or "prefix."</p>
+  </div>
+</section>
+
+<!-- ============ 11. GRAPH ============ -->
+<section class="section reveal" id="graph">
+  <div class="section-head"><span class="section-num">11</span><h2>Graph</h2></div>
+  <p class="tagline">Nodes connected by edges — the only structure built for many-to-many relationships.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 400 180" width="100%" style="max-width:360px;">
+      <g stroke="#1C2541" stroke-width="1.3">
+        <line x1="80" y1="40" x2="200" y2="30"/>
+        <line x1="80" y1="40" x2="70" y2="140"/>
+        <line x1="200" y1="30" x2="300" y2="90"/>
+        <line x1="70" y1="140" x2="300" y2="90"/>
+        <line x1="200" y1="30" x2="70" y2="140"/>
+      </g>
+      <g font-family="JetBrains Mono" font-size="13">
+        <circle cx="80" cy="40" r="18" fill="#F5E9D3" stroke="#A8721E"/><text x="80" y="45" text-anchor="middle">A</text>
+        <circle cx="200" cy="30" r="18" fill="#F5E9D3" stroke="#A8721E"/><text x="200" y="35" text-anchor="middle">B</text>
+        <circle cx="300" cy="90" r="18" fill="#F5E9D3" stroke="#A8721E"/><text x="300" y="95" text-anchor="middle">C</text>
+        <circle cx="70" cy="140" r="18" fill="#F5E9D3" stroke="#A8721E"/><text x="70" y="145" text-anchor="middle">D</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">Unlike a tree, a node can connect back to any other node — cycles are allowed, hierarchy is not required.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Anything with relationships between entities that aren't strictly hierarchical — maps, social networks, dependency graphs, circuit connections. Traverse it with BFS (shortest hops, unweighted) or DFS (explore everything, detect cycles).</p>
+  </div>
+</section>
+
+<!-- ============ 12. UNION-FIND ============ -->
+<section class="section reveal" id="union-find">
+  <div class="section-head"><span class="section-num">12</span><h2>Union-Find (disjoint set)</h2></div>
+  <p class="tagline">Tracks groups and merges them — answers "are these connected?" in near O(1).</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 460 120" width="100%" style="max-width:440px;">
+      <g font-family="JetBrains Mono" font-size="13">
+        <rect x="0" y="10" width="150" height="80" rx="8" fill="#DFEEE9" stroke="#296B5C"/>
+        <text x="75" y="35" text-anchor="middle" fill="#296B5C" font-size="11">group 1</text>
+        <text x="45" y="65" text-anchor="middle">A</text>
+        <text x="105" y="65" text-anchor="middle">B</text>
+        <text x="75" y="65" text-anchor="middle" fill="#8B8F9C">—</text>
+
+        <text x="200" y="55" fill="#A6432A">union(B, C) →</text>
+
+        <rect x="290" y="10" width="170" height="80" rx="8" fill="#F5E9D3" stroke="#A8721E"/>
+        <text x="375" y="35" text-anchor="middle" fill="#A8721E" font-size="11">merged group</text>
+        <text x="330" y="65" text-anchor="middle">A</text>
+        <text x="375" y="65" text-anchor="middle">B</text>
+        <text x="420" y="65" text-anchor="middle">C</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">Instead of re-running BFS/DFS every time a new edge arrives, union-find merges and checks groups near-instantly.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Use it when</span>
+    <p>Dynamic connectivity — edges are being added over time and you keep asking "are A and B connected now?" Also the standard tool for detecting cycles while building a graph edge-by-edge, and for Kruskal's minimum spanning tree.</p>
+  </div>
+</section>
+
+<!-- ============ DIFFERENCES / CONFUSIONS ============ -->
+<section class="section reveal" id="differences">
+  <div class="section-head"><span class="section-num">13</span><h2>The pairs that confuse everyone</h2></div>
+  <p class="tagline">Same-sounding, different guarantees. Read these once and the mix-ups stop.</p>
+
+  <div class="diff-grid">
+    <div class="diff-card">
+      <div class="diff-title">Array <span class="vs">vs</span> dynamic array</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Array</div>Fixed size, set at creation. Can't grow — you'd need to make a new one and copy everything.</div>
+        <div class="side b"><div class="h">Dynamic array</div>Same O(1) access, but grows itself by reallocating and doubling capacity when full. What Python <code>list</code> and Java <code>ArrayList</code> actually are.</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">Array <span class="vs">vs</span> linked list</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Array</div>Contiguous memory → O(1) index access, but O(n) insert/delete in the middle (shifting).</div>
+        <div class="side b"><div class="h">Linked list</div>Scattered memory → O(n) to reach an index, but O(1) insert/delete once you're at the node.</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">Stack <span class="vs">vs</span> queue</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Stack — LIFO</div>Last one in is the first one out. Pairs naturally with DFS and "undo."</div>
+        <div class="side b"><div class="h">Queue — FIFO</div>First one in is the first one out. Pairs naturally with BFS and "arrival order."</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">Hash map <span class="vs">vs</span> tree / BST</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Hash map</div>O(1) average lookup, but no ordering — you can't cheaply ask "what's the next-smallest key."</div>
+        <div class="side b"><div class="h">BST</div>O(log n) lookup (slower), but keeps sorted order for free — range queries, "closest value," in-order traversal.</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">Heap <span class="vs">vs</span> BST</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Heap</div>Only guarantees the root is the min/max. Great for "give me the extreme," useless for "give me everything in order" — that requires repeated removal.</div>
+        <div class="side b"><div class="h">BST</div>Guarantees full ordering (in-order traversal is sorted). Better when you need range queries or the k-th smallest at arbitrary times.</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">Trie <span class="vs">vs</span> hash map</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Trie</div>Built for prefixes. "All words starting with 'pre'" is O(L), independent of dictionary size.</div>
+        <div class="side b"><div class="h">Hash map</div>Built for exact matches only. Answers "is this exact word present" in O(1), but prefix search means scanning every key.</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">Tree <span class="vs">vs</span> graph</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">Tree</div>A restricted graph: no cycles, exactly one path between any two nodes, strict parent/child hierarchy.</div>
+        <div class="side b"><div class="h">Graph</div>No restrictions — cycles allowed, a node can connect back to any other node, no required hierarchy.</div>
+      </div>
+    </div>
+
+    <div class="diff-card">
+      <div class="diff-title">BFS <span class="vs">vs</span> DFS</div>
+      <div class="diff-row">
+        <div class="side a"><div class="h">BFS — queue</div>Explores level by level. Use when you need the shortest path in an unweighted graph.</div>
+        <div class="side b"><div class="h">DFS — stack / recursion</div>Dives as deep as possible before backing up. Use for exploring all paths, connectivity, and cycle detection.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BIG COMPARISON TABLE ============ -->
+<section class="section reveal" id="comparison">
+  <div class="section-head"><span class="section-num">14</span><h2>The full comparison table</h2></div>
+  <p class="tagline">Average case in <span style="color:var(--teal); font-weight:500;">teal</span>, worst case in <span style="color:var(--coral); font-weight:500;">coral</span> wherever they differ. Bookmark this one.</p>
+
+  <div class="big-table-wrap">
+    <table class="big-table">
+      <tr>
+        <th>Structure</th><th>Access</th><th>Search</th><th>Insert</th><th>Delete</th><th>Space</th>
+      </tr>
+      <tr><td class="name">Array</td><td><span class="avg">O(1)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(n)</span></td><td>O(n)</td></tr>
+      <tr><td class="name">Dynamic array</td><td><span class="avg">O(1)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(1)</span> <span class="worst">O(n) resize</span></td><td><span class="avg">O(n)</span></td><td>O(n)</td></tr>
+      <tr><td class="name">String (immutable)</td><td><span class="avg">O(1)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(n)</span> new copy</td><td><span class="avg">O(n)</span> new copy</td><td>O(n)</td></tr>
+      <tr><td class="name">Linked list</td><td><span class="avg">O(n)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(1)</span> at node</td><td><span class="avg">O(1)</span> at node</td><td>O(n)</td></tr>
+      <tr><td class="name">Stack</td><td><span class="avg">O(n)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(1)</span> top only</td><td><span class="avg">O(1)</span> top only</td><td>O(n)</td></tr>
+      <tr><td class="name">Queue / deque</td><td><span class="avg">O(n)</span></td><td><span class="avg">O(n)</span></td><td><span class="avg">O(1)</span> ends only</td><td><span class="avg">O(1)</span> ends only</td><td>O(n)</td></tr>
+      <tr><td class="name">Hash map / set</td><td>—</td><td><span class="avg">O(1)</span> <span class="worst">O(n)</span></td><td><span class="avg">O(1)</span> <span class="worst">O(n)</span></td><td><span class="avg">O(1)</span> <span class="worst">O(n)</span></td><td>O(n)</td></tr>
+      <tr><td class="name">Heap</td><td><span class="avg">O(1)</span> min/max only</td><td><span class="avg">O(n)</span> arbitrary item</td><td><span class="avg">O(log n)</span></td><td><span class="avg">O(log n)</span></td><td>O(n)</td></tr>
+      <tr><td class="name">BST (balanced)</td><td><span class="avg">O(log n)</span></td><td><span class="avg">O(log n)</span></td><td><span class="avg">O(log n)</span></td><td><span class="avg">O(log n)</span></td><td>O(n)</td></tr>
+      <tr><td class="name">BST (unbalanced)</td><td><span class="worst">O(n)</span></td><td><span class="worst">O(n)</span></td><td><span class="worst">O(n)</span></td><td><span class="worst">O(n)</span></td><td>O(n)</td></tr>
+      <tr><td class="name">Trie (L = word length)</td><td>—</td><td><span class="avg">O(L)</span></td><td><span class="avg">O(L)</span></td><td><span class="avg">O(L)</span></td><td>O(alphabet × nodes)</td></tr>
+      <tr><td class="name">Graph — adjacency list</td><td>—</td><td><span class="avg">O(V+E)</span> traverse</td><td><span class="avg">O(1)</span> add edge</td><td><span class="avg">O(E)</span> find edge</td><td>O(V+E)</td></tr>
+      <tr><td class="name">Union-Find</td><td>—</td><td><span class="avg">≈O(1)</span> find</td><td><span class="avg">≈O(1)</span> union</td><td>—</td><td>O(n)</td></tr>
+    </table>
+  </div>
+  <p class="diagram-caption" style="margin-top:0.8rem;">V = vertices, E = edges, L = string/word length, n = number of elements. "≈O(1)" for Union-Find means O(α(n)) with path compression — effectively constant for any real input size.</p>
+</section>
+
+<!-- ============ INTERVIEW QUESTIONS ============ -->
+<section class="section reveal" id="interview-qs">
+  <div class="section-head"><span class="section-num">15</span><h2>Most-asked interview questions, by structure</h2></div>
+  <p class="tagline">Master these and most variations you'll be asked fall out for free.</p>
+
+  <div class="iq-grid">
+    <div class="iq-card">
+      <h3>Array &amp; string</h3>
+      <div class="sub">Hash maps and two pointers solve most of these</div>
+      <ul class="iq-list">
+        <li>Two Sum <span class="badge easy">easy</span></li>
+        <li>Best Time to Buy/Sell Stock <span class="badge easy">easy</span></li>
+        <li>Valid Anagram <span class="badge easy">easy</span></li>
+        <li>Longest Substring Without Repeating Chars <span class="badge med">med</span></li>
+        <li>Product of Array Except Self <span class="badge med">med</span></li>
+        <li>3Sum <span class="badge med">med</span></li>
+        <li>Trapping Rain Water <span class="badge hard">hard</span></li>
+      </ul>
+    </div>
+
+    <div class="iq-card">
+      <h3>Linked list</h3>
+      <div class="sub">Dummy heads and fast/slow pointers solve most of these</div>
+      <ul class="iq-list">
+        <li>Reverse a Linked List <span class="badge easy">easy</span></li>
+        <li>Merge Two Sorted Lists <span class="badge easy">easy</span></li>
+        <li>Linked List Cycle Detection <span class="badge easy">easy</span></li>
+        <li>Remove Nth Node From End <span class="badge med">med</span></li>
+        <li>Reorder / Find Middle of List <span class="badge med">med</span></li>
+        <li>LRU Cache <span class="badge med">med</span></li>
+        <li>Merge K Sorted Lists <span class="badge hard">hard</span></li>
+      </ul>
+    </div>
+
+    <div class="iq-card">
+      <h3>Stack &amp; queue</h3>
+      <div class="sub">Monotonic stacks and simulation problems</div>
+      <ul class="iq-list">
+        <li>Valid Parentheses <span class="badge easy">easy</span></li>
+        <li>Min Stack — O(1) getMin <span class="badge easy">easy</span></li>
+        <li>Implement Queue using Stacks <span class="badge easy">easy</span></li>
+        <li>Daily Temperatures <span class="badge med">med</span></li>
+        <li>Sliding Window Maximum (deque) <span class="badge hard">hard</span></li>
+        <li>Largest Rectangle in Histogram <span class="badge hard">hard</span></li>
+      </ul>
+    </div>
+
+    <div class="iq-card">
+      <h3>Hash map &amp; heap</h3>
+      <div class="sub">The instant-lookup and top-K family</div>
+      <ul class="iq-list">
+        <li>Group Anagrams <span class="badge med">med</span></li>
+        <li>Top K Frequent Elements <span class="badge med">med</span></li>
+        <li>Kth Largest Element <span class="badge med">med</span></li>
+        <li>Merge Intervals <span class="badge med">med</span></li>
+        <li>Find Median from Data Stream <span class="badge hard">hard</span></li>
+      </ul>
+    </div>
+
+    <div class="iq-card">
+      <h3>Tree &amp; trie</h3>
+      <div class="sub">Recursion is almost always the answer here</div>
+      <ul class="iq-list">
+        <li>Maximum Depth of Binary Tree <span class="badge easy">easy</span></li>
+        <li>Invert a Binary Tree <span class="badge easy">easy</span></li>
+        <li>Validate Binary Search Tree <span class="badge med">med</span></li>
+        <li>Lowest Common Ancestor <span class="badge med">med</span></li>
+        <li>Implement Trie <span class="badge med">med</span></li>
+        <li>Serialize / Deserialize Binary Tree <span class="badge hard">hard</span></li>
+      </ul>
+    </div>
+
+    <div class="iq-card">
+      <h3>Graph &amp; union-find</h3>
+      <div class="sub">Roughly a third of interview problems live here</div>
+      <ul class="iq-list">
+        <li>Number of Islands <span class="badge med">med</span></li>
+        <li>Course Schedule (cycle detection) <span class="badge med">med</span></li>
+        <li>Clone Graph <span class="badge med">med</span></li>
+        <li>Number of Connected Components <span class="badge med">med</span></li>
+        <li>Redundant Connection (Union-Find) <span class="badge med">med</span></li>
+        <li>Word Ladder <span class="badge hard">hard</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DECISION FRAMEWORK ============ -->
+<section class="decision reveal" id="decision-framework">
+  <div class="decision-inner">
+    <span class="eyebrow" style="color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:13px; text-transform:uppercase; letter-spacing:0.06em;">The part that actually matters in interviews</span>
+    <h2 style="margin-top:0.8rem;">Which one do I use?</h2>
+    <p class="tagline">Six questions, asked in order, get you to the right structure almost every time.</p>
+
+    <div class="steps">
+      <div class="step"><span class="num">1</span><div><div class="q">Do I need order preserved by position (index)?</div><div class="a">→ array or dynamic array</div></div></div>
+      <div class="step"><span class="num">2</span><div><div class="q">Do I need fast lookup by key, not position?</div><div class="a">→ hash map / hash set</div></div></div>
+      <div class="step"><span class="num">3</span><div><div class="q">Is there a "most recent" or "first in" pattern?</div><div class="a">→ stack (LIFO) or queue (FIFO)</div></div></div>
+      <div class="step"><span class="num">4</span><div><div class="q">Do I only care about the extreme (min/max), not full order?</div><div class="a">→ heap / priority queue</div></div></div>
+      <div class="step"><span class="num">5</span><div><div class="q">Is the data naturally hierarchical or connected?</div><div class="a">→ tree, trie, or graph — depending on shape</div></div></div>
+      <div class="step"><span class="num">6</span><div><div class="q">Am I merging or checking group membership as edges arrive?</div><div class="a">→ Union-Find</div></div></div>
+    </div>
+
+    <table class="matrix">
+      <tr><th>If your problem needs...</th><th>Use</th><th>Because</th></tr>
+      <tr><td>Fast access by position, fixed/known size</td><td class="struct">Array</td><td>O(1) index math</td></tr>
+      <tr><td>Growable general-purpose list</td><td class="struct">Dynamic array</td><td>O(1) append, O(1) index</td></tr>
+      <tr><td>"Have I seen this?" / counting</td><td class="struct">Hash map/set</td><td>O(1) average lookup</td></tr>
+      <tr><td>Frequent insert/delete at the front</td><td class="struct">Linked list</td><td>O(1) splice once you hold the node</td></tr>
+      <tr><td>Undo, nested matching, "next greater"</td><td class="struct">Stack</td><td>LIFO matches the shape</td></tr>
+      <tr><td>Arrival order / shortest hops</td><td class="struct">Queue</td><td>FIFO = shortest-path-first in BFS</td></tr>
+      <tr><td>Always need current min/max only</td><td class="struct">Heap</td><td>O(log n) insert/remove, O(1) peek</td></tr>
+      <tr><td>Hierarchy + need sorted search</td><td class="struct">Tree / BST</td><td>O(log n) search, in-order = sorted</td></tr>
+      <tr><td>Prefix / autocomplete lookups</td><td class="struct">Trie</td><td>O(L) regardless of dictionary size</td></tr>
+      <tr><td>Many-to-many relationships</td><td class="struct">Graph</td><td>only structure modeling arbitrary connections</td></tr>
+      <tr><td>Group membership as edges arrive</td><td class="struct">Union-Find</td><td>near O(1) union/find</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ RESOURCES ============ -->
+<section class="section reveal" id="resources">
+  <div class="section-head"><span class="section-num">16</span><h2>Going further</h2></div>
+  <p class="tagline">This page gets you fluent in the vocabulary. These take you from fluent to fast.</p>
+
+  <div class="res-grid">
+    <a class="res-card" href="https://visualgo.net" target="_blank" rel="noopener">
+      <div class="res-top"><h3>VisuAlgo</h3><span class="res-tag">free</span></div>
+      <p>Animated, step-by-step visualizations of every structure and algorithm on this page — built at NUS specifically to make the "how" click.</p>
+      <span class="res-url">visualgo.net</span>
+    </a>
+
+    <a class="res-card" href="https://neetcode.io/roadmap" target="_blank" rel="noopener">
+      <div class="res-top"><h3>NeetCode roadmap</h3><span class="res-tag">free</span></div>
+      <p>A structured, ordered list of the exact interview problems to solve for each structure — the natural next step after this page.</p>
+      <span class="res-url">neetcode.io/roadmap</span>
+    </a>
+
+    <a class="res-card" href="https://www.bigocheatsheet.com/" target="_blank" rel="noopener">
+      <div class="res-top"><h3>Big-O Cheat Sheet</h3><span class="res-tag">free</span></div>
+      <p>A single reference page of every common data structure and sorting algorithm's time and space complexity — good for a final pre-interview scan.</p>
+      <span class="res-url">bigocheatsheet.com</span>
+    </a>
+
+    <a class="res-card" href="https://leetcode.com/" target="_blank" rel="noopener">
+      <div class="res-top"><h3>LeetCode</h3><span class="res-tag">freemium</span></div>
+      <p>Where you actually put the patterns from the decision framework into practice, timed, with real interview-style problems.</p>
+      <span class="res-url">leetcode.com</span>
+    </a>
+
+    <a class="res-card" href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/" target="_blank" rel="noopener">
+      <div class="res-top"><h3>MIT 6.006</h3><span class="res-tag">free</span></div>
+      <p>Full MIT OpenCourseWare lecture series on algorithms — for when you want the formal proofs and derivations behind the intuition above.</p>
+      <span class="res-url">ocw.mit.edu</span>
+    </a>
+
+    <a class="res-card" href="https://www.geeksforgeeks.org/dsa/dsa-tutorial-learn-data-structures-and-algorithms/" target="_blank" rel="noopener">
+      <div class="res-top"><h3>GeeksforGeeks DSA</h3><span class="res-tag">free</span></div>
+      <p>Deep-dive written articles and implementations in multiple languages for every structure — useful when you need the fine implementation details.</p>
+      <span class="res-url">geeksforgeeks.org</span>
+    </a>
+  </div>
+
+  <div class="callout" style="margin-top:1.5rem;">
+    <span class="label">If you only do one thing next</span>
+    <p>Pick one structure you scored lowest on in the quiz above, find its problems on NeetCode's roadmap, and solve three of them today. Recognition (this page) plus repetition (that) is the whole game.</p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo"><span class="dot"></span>DS Manual</div>
+      <p>A field manual for learning data structures the way they're actually used in interviews and real code — reasoning first, syntax second. Learn the trade-off, not the syntax; the syntax changes per language, the trade-off never does.</p>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-h">Jump to</div>
+      <a href="#array">Data structures</a>
+      <a href="#differences">Confusing pairs</a>
+      <a href="#comparison">Comparison table</a>
+      <a href="#interview-qs">Interview questions</a>
+      <a href="#resources">Resources</a>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-h">Contact</div>
+      <span class="footer-name">Katta Koushik Reddy</span>
+      <a href="mailto:kattak087@gmail.com">kattak087@gmail.com</a>
+      <a href="tel:+918639004645">+91 86390 04645</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>Built as a personal study reference — not for redistribution.</span>
+    <span>© 2026 Katta Koushik Reddy</span>
+  </div>
+</footer>
+
+<script>
+  const sections = [
+    ["01","Array","array","Data structures"],["02","Dynamic array","dynamic-array","Data structures"],
+    ["03","String","string","Data structures"],["04","Linked list","linked-list","Data structures"],
+    ["05","Stack","stack","Data structures"],["06","Queue & deque","queue","Data structures"],
+    ["07","Hash map","hash-map","Data structures"],["08","Heap","heap","Data structures"],
+    ["09","Tree / BST","tree","Data structures"],["10","Trie","trie","Data structures"],
+    ["11","Graph","graph","Data structures"],["12","Union-Find","union-find","Data structures"],
+    ["13","Confusing pairs","differences","Study"],["14","Full comparison table","comparison","Study"],
+    ["15","Which one do I use?","decision-framework","Study"],
+    ["16","Interview questions","interview-qs","Interview prep"],
+    ["17","Resources","resources","Interview prep"]
+  ];
+  const toc = document.getElementById('toc');
+  sections.forEach(([n,label,id])=>{
+    const a = document.createElement('a');
+    a.href = '#'+id;
+    a.innerHTML = '<span class="n">'+n+'</span>'+label;
+    toc.appendChild(a);
+  });
+
+  const topnavLinks = document.getElementById('topnavLinks');
+  const sidenavLinks = document.getElementById('sidenavLinks');
+  const navAnchors = {};
+  let lastGroup = null;
+  sections.forEach(([n,label,id,group])=>{
+    const top = document.createElement('a');
+    top.href = '#'+id;
+    top.textContent = label;
+    topnavLinks.appendChild(top);
+
+    if(group !== lastGroup){
+      const gl = document.createElement('div');
+      gl.className = 'sidenav-group-label';
+      gl.textContent = group;
+      sidenavLinks.appendChild(gl);
+      lastGroup = group;
+    }
+    const side = document.createElement('a');
+    side.href = '#'+id;
+    side.textContent = label;
+    sidenavLinks.appendChild(side);
+
+    navAnchors[id] = [top, side];
+  });
+
+  const topnav = document.getElementById('topnav');
+  const spyTargets = sections
+    .map(([,,id])=>({id, el: document.getElementById(id)}))
+    .filter(s => s.el);
+
+  let navTicking = false;
+  function updateNav(){
+    topnav.classList.toggle('scrolled', window.scrollY > 8);
+
+    const offset = 90; // px below the fixed nav
+    let activeId = null;
+    for(const {id, el} of spyTargets){
+      if(el.getBoundingClientRect().top - offset <= 0) activeId = id;
+    }
+
+    Object.values(navAnchors).forEach(pair => pair.forEach(a => a.classList.remove('active')));
+    if(activeId && navAnchors[activeId]){
+      navAnchors[activeId].forEach(link => {
+        link.classList.add('active');
+        link.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+      });
+    }
+    navTicking = false;
+  }
+
+  window.addEventListener('scroll', ()=>{
+    if(!navTicking){
+      requestAnimationFrame(updateNav);
+      navTicking = true;
+    }
+  }, {passive:true});
+
+  updateNav(); // correctly leaves nothing active while still in the hero
+
+  const revealObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+</script>
+
+<script>
+  const quiz = [
+    {q:"You need to reach element #500 instantly without checking anything before it. Best fit?", opts:["Array","Linked list","Stack","Trie"], correct:0, why:"Arrays compute the exact address from the index — O(1), no walking required."},
+    {q:"You're appending items one by one and don't know the final count. Best default?", opts:["Fixed array","Dynamic array","Linked list","Heap"], correct:1, why:"Dynamic arrays double their capacity as needed, giving O(1) amortized appends without you pre-sizing anything."},
+    {q:"Building a long string inside a loop with result += char is slow because...", opts:["Loops are always O(n²)","Strings are immutable, so each += builds a new string","Characters take more memory than integers","Python is slow"], correct:1, why:"Immutability means every concatenation copies the whole string so far — O(n) per append, O(n²) total."},
+    {q:"You'll insert and delete constantly at the front of a collection, and never need index access. Best fit?", opts:["Array","Linked list","Hash map","Heap"], correct:1, why:"Linked lists insert/delete at a known node in O(1) — no shifting, unlike an array."},
+    {q:"Which structure naturally models 'undo the last action'?", opts:["Queue","Heap","Stack","Trie"], correct:2, why:"Stacks are LIFO — the most recent action is exactly what you touch first, which is what undo needs."},
+    {q:"BFS uses a queue instead of a stack because...", opts:["Queues use less memory","FIFO order guarantees nodes are explored in discovery order, giving shortest paths","Stacks can't hold graph nodes","It's just convention"], correct:1, why:"Processing nodes in the order they were first discovered is exactly what guarantees shortest hops in an unweighted graph."},
+    {q:"You keep thinking 'I'll loop through to check if I've seen this value.' What should replace that instinct?", opts:["Sort the array first","Use a hash map/set for O(1) lookup","Use a heap","Use recursion"], correct:1, why:"That instinct is the single biggest trigger for switching an O(n) scan into an O(1) hash lookup."},
+    {q:"You only ever need the current smallest value, never the full sorted list. Best fit?", opts:["Sorted array","Heap","Binary search tree","Trie"], correct:1, why:"A heap gives O(1) peek and O(log n) insert/remove for the extreme value, without paying to sort everything."},
+    {q:"A BST's O(log n) search guarantee breaks down when...", opts:["It stores more than 1000 items","It's not self-balancing and gets unlucky (e.g. sorted-order insertion)","You use integers instead of strings","It has more than 2 children per node"], correct:1, why:"An unbalanced BST built from sorted input degenerates into a straight line — effectively a linked list, O(n)."},
+    {q:"You need instant autocomplete over 100,000 words. Best fit over a plain hash set?", opts:["Hash set is always better","Trie — O(L) prefix lookups regardless of dictionary size","Array of strings","Stack"], correct:1, why:"A hash set can only confirm exact matches. A trie answers 'all words starting with...' in time proportional to the prefix length, not the dictionary size."},
+    {q:"Modeling a social network where anyone can connect to anyone (including cycles)?", opts:["Tree","Graph","Trie","Stack"], correct:1, why:"Trees forbid cycles and require strict hierarchy. Graphs are the only structure built for arbitrary many-to-many connections."},
+    {q:"Edges are added one at a time and you keep asking 'are A and B connected yet?' Most efficient fit?", opts:["Re-run BFS every time","Union-Find","Sort the edges","Hash map of all reachable pairs"], correct:1, why:"Union-Find answers and merges group membership in near-O(1), far cheaper than re-traversing the whole graph each time."}
+  ];
+  let qi = 0, qscore = 0;
+  const qText = document.getElementById('qText');
+  const qOpts = document.getElementById('qOpts');
+  const qExplain = document.getElementById('qExplain');
+  const qNext = document.getElementById('qNext');
+  const qProgress = document.getElementById('qProgress');
+  const qScore = document.getElementById('qScore');
+  const qDone = document.getElementById('qDone');
+  const qCardTop = document.querySelector('.quiz-top');
+
+  function renderQuiz(){
+    const item = quiz[qi];
+    qText.textContent = item.q;
+    qOpts.innerHTML = '';
+    qExplain.style.display = 'none';
+    qNext.style.display = 'none';
+    qProgress.textContent = 'Question ' + (qi+1) + ' of ' + quiz.length;
+    qScore.textContent = 'Score: ' + qscore;
+    item.opts.forEach((opt, idx)=>{
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=>selectAnswer(idx));
+      qOpts.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(idx){
+    const item = quiz[qi];
+    const btns = qOpts.querySelectorAll('.quiz-opt');
+    btns.forEach((b,i)=>{
+      b.disabled = true;
+      if(i === item.correct) b.classList.add('correct');
+      else if(i === idx) b.classList.add('incorrect');
+    });
+    if(idx === item.correct) qscore++;
+    qScore.textContent = 'Score: ' + qscore;
+    qExplain.textContent = item.why;
+    qExplain.style.display = 'block';
+    qNext.style.display = 'inline-block';
+  }
+
+  qNext.addEventListener('click', ()=>{
+    qi++;
+    if(qi < quiz.length){ renderQuiz(); }
+    else {
+      qCardTop.style.display = 'none';
+      qText.style.display = 'none';
+      qOpts.style.display = 'none';
+      qExplain.style.display = 'none';
+      qNext.style.display = 'none';
+      qDone.style.display = 'block';
+      document.getElementById('qFinalScore').textContent = qscore + ' / ' + quiz.length;
+    }
+  });
+
+  document.getElementById('qRestart').addEventListener('click', ()=>{
+    qi = 0; qscore = 0;
+    qCardTop.style.display = 'flex';
+    qText.style.display = 'block';
+    qOpts.style.display = 'grid';
+    qDone.style.display = 'none';
+    renderQuiz();
+  });
+
+  renderQuiz();
+</script>
+
+</body>
+</html>

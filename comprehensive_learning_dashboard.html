@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Learning Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--surface-0, #f5f5f5);
+            color: var(--text-primary, #1a1a1a);
+            padding: 20px;
+        }
+
+        .header {
+            max-width: 1400px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--text-secondary, #666);
+            font-size: 14px;
+        }
+
+        .filter-section {
+            max-width: 1400px;
+            margin: 0 auto 25px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary, #666);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border: 0.5px solid var(--border, #ccc);
+            background: var(--surface-2, #fff);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: var(--text-primary, #1a1a1a);
+        }
+
+        .tab-btn.active {
+            background: #185fa5;
+            color: white;
+            border-color: #185fa5;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--border-strong, #999);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .topic-card {
+            background: var(--surface-2, #fff);
+            border: 0.5px solid var(--border, #ddd);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .topic-card:hover {
+            border-color: var(--border-strong, #999);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .difficulty-beginner {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-intermediate {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-advanced {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .interview-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #e7f3ff;
+            color: #185fa5;
+            font-weight: 600;
+        }
+
+        .core-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: var(--text-secondary, #666);
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .meta-icon {
+            font-size: 14px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: var(--text-secondary, #666);
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        .card-section {
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary, #1a1a1a);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .topics-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .topic-item {
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text-primary, #1a1a1a);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topic-item::before {
+            content: '▸';
+            color: var(--text-secondary, #999);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .importance-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .importance-label {
+            color: var(--text-secondary, #666);
+            min-width: 60px;
+        }
+
+        .importance-fill {
+            flex: 1;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .importance-bar.high .importance-fill { background: #d4edda; }
+        .importance-bar.high .importance-fill::after { background: #2e7d32; }
+
+        .importance-bar.medium .importance-fill { background: #fff3cd; }
+        .importance-bar.medium .importance-fill::after { background: #f57f17; }
+
+        .importance-bar.low .importance-fill { background: #e3f2fd; }
+        .importance-bar.low .importance-fill::after { background: #1976d2; }
+
+        .importance-fill::after {
+            content: '';
+            display: block;
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .importance-bar.high .importance-fill::after { width: 90%; }
+        .importance-bar.medium .importance-fill::after { width: 70%; }
+        .importance-bar.low .importance-fill::after { width: 50%; }
+
+        .resources {
+            border-top: 0.5px solid var(--border, #ddd);
+            padding-top: 12px;
+        }
+
+        .resource-header {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary, #666);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 6px 0;
+            font-size: 12px;
+            color: #185fa5;
+            text-decoration: none;
+            border-bottom: 0.5px solid var(--border, #eee);
+            padding-bottom: 6px;
+            transition: color 0.2s;
+        }
+
+        .resource-link:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .resource-link:hover {
+            color: #0c2d5c;
+            text-decoration: underline;
+        }
+
+        .resource-type {
+            display: inline-block;
+            font-size: 10px;
+            background: var(--surface-1, #f0f0f0);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 6px;
+            color: var(--text-secondary, #666);
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-indicator {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 0.5px solid var(--border, #ddd);
+            font-size: 12px;
+            color: var(--text-secondary, #666);
+        }
+
+        .learning-path {
+            font-size: 11px;
+            color: var(--text-secondary, #666);
+            margin-top: 8px;
+            padding: 8px;
+            background: var(--surface-1, #f8f8f8);
+            border-radius: 6px;
+            border-left: 2px solid #185fa5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .badge-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📚 Complete Learning Dashboard</h1>
+    <p>Java, Spring Boot, Angular, React, SQL, DSA & DevOps — Everything you need for interviews & development</p>
+</div>
+
+<div class="filter-section">
+    <div class="filter-label">Filter by Topic</div>
+    <div class="filter-tabs">
+        <button class="tab-btn active" onclick="filterTopic('all')">All Topics</button>
+        <button class="tab-btn" onclick="filterTopic('java')">Java</button>
+        <button class="tab-btn" onclick="filterTopic('springboot')">Spring Boot</button>
+        <button class="tab-btn" onclick="filterTopic('angular')">Angular</button>
+        <button class="tab-btn" onclick="filterTopic('react')">React</button>
+        <button class="tab-btn" onclick="filterTopic('sql')">SQL</button>
+        <button class="tab-btn" onclick="filterTopic('dsa')">DSA</button>
+        <button class="tab-btn" onclick="filterTopic('devops')">DevOps</button>
+    </div>
+</div>
+
+<div class="container" id="topicsContainer"></div>
+
+<script>
+const topicsData = [
+    // ===== JAVA =====
+    {
+        id: 1,
+        topic: 'java',
+        title: 'OOP Fundamentals',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1-2 weeks',
+        description: 'Foundation of Java: Classes, objects, inheritance, polymorphism, abstraction, encapsulation',
+        subtopics: [
+            'Classes & Objects creation',
+            'Constructors & Destructors',
+            'Inheritance (single, multi-level)',
+            'Polymorphism (compile-time & runtime)',
+            'Abstraction & Interfaces',
+            'Encapsulation & Access Modifiers'
+        ],
+        whyImportant: 'Everything in Java is built on OOP. Without this, nothing else makes sense.',
+        resources: [
+            { name: 'GeeksforGeeks Java OOP', type: 'Article', url: 'https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/' },
+            { name: 'Java OOP Deep Dive (Telusko)', type: 'Video', url: 'https://www.youtube.com/watch?v=xk4_1vDrzzo' },
+            { name: 'Oracle Java Docs - Classes', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/java/concepts/' }
+        ]
+    },
+    {
+        id: 2,
+        topic: 'java',
+        title: 'Collections Framework',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: 'Core data structures: List, Set, Map, Queue, Deque, ArrayList, HashMap, HashSet, TreeMap, LinkedList',
+        subtopics: [
+            'List Interface (ArrayList, LinkedList, Vector)',
+            'Set Interface (HashSet, TreeSet, LinkedHashSet)',
+            'Map Interface (HashMap, TreeMap, LinkedHashMap)',
+            'Queue & Deque (PriorityQueue, ArrayDeque)',
+            'Iterators & Comparators',
+            'Sorting & Searching Collections',
+            'Fail-fast behavior & ConcurrentModificationException'
+        ],
+        whyImportant: 'Most frequently asked in interviews. Used in every Spring Boot project. Critical for DSA.',
+        resources: [
+            { name: 'GeeksforGeeks Collections', type: 'Article', url: 'https://www.geeksforgeeks.org/collections-in-java-2/' },
+            { name: 'Java Collections Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=EJI7LQI5GBo' },
+            { name: 'Oracle Java Collections', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/collections/' }
+        ]
+    },
+    {
+        id: 3,
+        topic: 'java',
+        title: 'Exception Handling',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'Error management: Try-catch, throws, custom exceptions, finally block, exception hierarchy',
+        subtopics: [
+            'Checked vs Unchecked Exceptions',
+            'Exception Hierarchy (Throwable, Exception, Error)',
+            'Try-Catch-Finally blocks',
+            'Throw & Throws keywords',
+            'Custom Exceptions',
+            'Multiple catch blocks',
+            'Try-with-resources'
+        ],
+        whyImportant: 'Every production code needs proper exception handling. Interview standard.',
+        resources: [
+            { name: 'GeeksforGeeks Exception Handling', type: 'Article', url: 'https://www.geeksforgeeks.org/exception-handling-in-java/' },
+            { name: 'Exception Handling Full Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=1XAfapkBQjk' },
+            { name: 'Oracle Exception Handling', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/essential/exceptions/' }
+        ]
+    },
+    {
+        id: 4,
+        topic: 'java',
+        title: 'Java 8+ Features',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: 'Modern Java: Lambdas, Streams, Functional Interfaces, Optional, Method References, Date-Time API',
+        subtopics: [
+            'Lambda Expressions & Syntax',
+            'Functional Interfaces (@FunctionalInterface)',
+            'Streams API (filter, map, reduce)',
+            'Optional class (orElse, ifPresent, flatMap)',
+            'Method References (::)',
+            'Default & Static Methods in Interfaces',
+            'Date-Time API (LocalDate, LocalDateTime)',
+            'forEach vs traditional loops'
+        ],
+        whyImportant: 'Modern Java & Spring Boot heavily use these. Expected in all interviews.',
+        resources: [
+            { name: 'Baeldung Java Streams', type: 'Article', url: 'https://www.baeldung.com/java-streams' },
+            { name: 'Java 8 Features Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=PQiI-c_duYc' },
+            { name: 'Oracle Streams', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/collections/streams/' }
+        ]
+    },
+    {
+        id: 5,
+        topic: 'java',
+        title: 'Multithreading & Concurrency',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'medium',
+        learningTime: '3-4 weeks',
+        description: 'Advanced threading: Threads, synchronization, thread safety, concurrent collections, executors, thread pools',
+        subtopics: [
+            'Thread Creation (extends Thread, implements Runnable)',
+            'Thread Lifecycle',
+            'Synchronization (synchronized keyword)',
+            'Locks (ReentrantLock, ReadWriteLock)',
+            'Thread-safe Collections (CopyOnWriteArrayList, ConcurrentHashMap)',
+            'Executor Framework & Thread Pools',
+            'Volatile keyword',
+            'Atomic Variables (AtomicInteger, AtomicReference)'
+        ],
+        whyImportant: 'Advanced topic. Important for senior roles & system design. Whoville may need it.',
+        resources: [
+            { name: 'GeeksforGeeks Multithreading', type: 'Article', url: 'https://www.geeksforgeeks.org/multithreading-in-java/' },
+            { name: 'Concurrency in Practice (detailed)', type: 'Video', url: 'https://www.youtube.com/watch?v=r_MbozPFZv0' },
+            { name: 'Oracle Concurrency', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/essential/concurrency/' }
+        ]
+    },
+    {
+        id: 6,
+        topic: 'java',
+        title: 'Design Patterns',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Reusable solutions: Singleton, Builder, Factory, Repository, Observer, Decorator, Strategy, Adapter',
+        subtopics: [
+            'Creational: Singleton, Factory, Builder, Prototype',
+            'Structural: Adapter, Decorator, Facade, Proxy',
+            'Behavioral: Observer, Strategy, Command, State',
+            'Repository Pattern (for Spring)',
+            'Dependency Injection Pattern',
+            'MVC Pattern',
+            'SOLID Principles'
+        ],
+        whyImportant: 'Shows design thinking. Every senior engineer knows these. Critical for code quality.',
+        resources: [
+            { name: 'Refactoring.guru Design Patterns', type: 'Article', url: 'https://refactoring.guru/design-patterns/java' },
+            { name: 'Design Patterns in Java', type: 'Video', url: 'https://www.youtube.com/watch?v=NU_1StN5Tkk' },
+            { name: 'Head First Design Patterns (Book)', type: 'Book', url: 'https://www.oreilly.com/library/view/head-first-design/0596007124/' }
+        ]
+    },
+    {
+        id: 7,
+        topic: 'java',
+        title: 'String, StringBuilder, StringBuffer',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'String handling: Immutability, StringBuilder, StringBuffer, String pool, performance',
+        subtopics: [
+            'String immutability & String pool',
+            'Common String methods',
+            'StringBuilder vs StringBuffer',
+            'Performance in loops',
+            'String interning',
+            'Regular Expressions'
+        ],
+        whyImportant: 'Fundamental. String handling is key to DSA & real-world code. Common interview trap.',
+        resources: [
+            { name: 'GeeksforGeeks String in Java', type: 'Article', url: 'https://www.geeksforgeeks.org/strings-in-java/' },
+            { name: 'String Performance Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=q6eoM5i46c4' },
+            { name: 'Oracle String Documentation', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/java/data/strings.html' }
+        ]
+    },
+    {
+        id: 8,
+        topic: 'java',
+        title: 'Generics & Type Erasure',
+        difficulty: 'intermediate',
+        interview: true,
+        core: false,
+        importance: 'medium',
+        learningTime: '1.5 weeks',
+        description: 'Type safety: Generic classes, generic methods, bounded wildcards, type erasure',
+        subtopics: [
+            'Generic Classes & Methods',
+            'Type Parameters & Bounds',
+            'Wildcards (? extends, ? super)',
+            'Type Erasure',
+            'Bridge Methods',
+            'Generic inheritance',
+            'PECS principle'
+        ],
+        whyImportant: 'Used in Collections. Advanced interviews ask about this. Helps understand framework code.',
+        resources: [
+            { name: 'Baeldung Generics', type: 'Article', url: 'https://www.baeldung.com/java-generics' },
+            { name: 'Generics Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=K1iu1kXkVoA' },
+            { name: 'Oracle Generics', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/java/generics/' }
+        ]
+    },
+    {
+        id: 9,
+        topic: 'java',
+        title: 'File I/O & NIO',
+        difficulty: 'intermediate',
+        interview: false,
+        core: false,
+        importance: 'low',
+        learningTime: '1 week',
+        description: 'File operations: File I/O, NIO, Streams, Channels, Buffers, File handling',
+        subtopics: [
+            'File I/O basics',
+            'Input/Output Streams',
+            'NIO (New I/O)',
+            'Channels & Buffers',
+            'File operations (read, write, delete)',
+            'Serialization'
+        ],
+        whyImportant: 'Less common in web apps. Good to know for file operations. Not interview priority.',
+        resources: [
+            { name: 'GeeksforGeeks File I/O', type: 'Article', url: 'https://www.geeksforgeeks.org/file-io-in-java/' },
+            { name: 'Java File Operations', type: 'Video', url: 'https://www.youtube.com/watch?v=JZp6N8nQH1M' },
+            { name: 'Oracle File I/O', type: 'Docs', url: 'https://docs.oracle.com/javase/tutorial/i18n/resbundle/propfile.html' }
+        ]
+    },
+
+    // ===== SPRING BOOT =====
+    {
+        id: 10,
+        topic: 'springboot',
+        title: 'Spring & Dependency Injection',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Foundation: IoC container, Beans, Dependency Injection, Annotations, Spring Context',
+        subtopics: [
+            'Inversion of Control (IoC)',
+            'Dependency Injection concept',
+            '@Component, @Service, @Repository, @Controller',
+            '@Bean & @Configuration',
+            'Autowiring (@Autowired, constructor injection)',
+            'Bean scopes (singleton, prototype, request)',
+            'Spring Context & ApplicationContext'
+        ],
+        whyImportant: 'Heart of Spring. Understand this deeply - everything else builds on it.',
+        resources: [
+            { name: 'Spring.io - Getting Started', type: 'Docs', url: 'https://spring.io/guides/gs/spring-boot/' },
+            { name: 'Baeldung Spring DI', type: 'Article', url: 'https://www.baeldung.com/spring-dependency-injection' },
+            { name: 'Spring Boot Basics (Telusko)', type: 'Video', url: 'https://www.youtube.com/watch?v=35EQXmHKZYs' }
+        ]
+    },
+    {
+        id: 11,
+        topic: 'springboot',
+        title: 'REST APIs & Controllers',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: '@RestController, @RequestMapping, HTTP methods, Request/Response, Status codes, Headers',
+        subtopics: [
+            '@RestController vs @Controller',
+            '@RequestMapping, @GetMapping, @PostMapping, @PutMapping, @DeleteMapping',
+            '@PathVariable & @RequestParam',
+            '@RequestBody & @ResponseBody',
+            'Response entities & Status codes',
+            'Content negotiation',
+            'CORS handling'
+        ],
+        whyImportant: 'Core of web APIs. Whoville uses this. Essential for any backend role.',
+        resources: [
+            { name: 'Spring.io - Building REST Service', type: 'Docs', url: 'https://spring.io/guides/gs/rest-service/' },
+            { name: 'Baeldung REST API', type: 'Article', url: 'https://www.baeldung.com/rest-with-spring-tutorial' },
+            { name: 'REST API with Spring Boot', type: 'Video', url: 'https://www.youtube.com/watch?v=RQ0d8KI6Aes' }
+        ]
+    },
+    {
+        id: 12,
+        topic: 'springboot',
+        title: 'Spring Data JPA & Hibernate',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: 'Database: Entities, Repositories, JPA, Hibernate, ORM, Relationships, Queries',
+        subtopics: [
+            '@Entity, @Table, @Column annotations',
+            'Repository interface & CRUD operations',
+            'JpaRepository vs CrudRepository',
+            'Query methods naming convention',
+            '@Query custom queries',
+            'OneToOne, OneToMany, ManyToOne, ManyToMany',
+            'Lazy vs Eager loading',
+            'Cascading & orphan removal'
+        ],
+        whyImportant: 'Every Spring Boot app uses JPA. Whoville needs this. Core for all data operations.',
+        resources: [
+            { name: 'Spring.io - Data JPA', type: 'Docs', url: 'https://spring.io/guides/gs/accessing-data-jpa/' },
+            { name: 'Baeldung JPA Guide', type: 'Article', url: 'https://www.baeldung.com/spring-data-jpa-intro' },
+            { name: 'JPA Complete Course', type: 'Video', url: 'https://www.youtube.com/watch?v=3anqIP3GJJ0' }
+        ]
+    },
+    {
+        id: 13,
+        topic: 'springboot',
+        title: 'Validation & Exception Handling',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: '@Valid, @ControllerAdvice, GlobalExceptionHandler, custom validators, error responses',
+        subtopics: [
+            'Bean Validation (@Valid, @NotNull, @Email)',
+            'Custom validators',
+            '@ControllerAdvice global exception handler',
+            '@ExceptionHandler annotations',
+            'Global error response format',
+            'Validation in different layers',
+            'Error logging'
+        ],
+        whyImportant: 'Production code needs proper validation. Shows professional code quality in Whoville.',
+        resources: [
+            { name: 'Baeldung Validation', type: 'Article', url: 'https://www.baeldung.com/spring-boot-bean-validation' },
+            { name: 'Exception Handling Best Practices', type: 'Article', url: 'https://www.baeldung.com/exception-handling-for-rest-with-spring' },
+            { name: 'Spring Validation Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=6AjAG3FHLYA' }
+        ]
+    },
+    {
+        id: 14,
+        topic: 'springboot',
+        title: 'Transactions & Database',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: '@Transactional, ACID, Propagation, Isolation, Hibernation, Database operations',
+        subtopics: [
+            '@Transactional annotation',
+            'Transaction propagation (REQUIRED, REQUIRES_NEW, NESTED)',
+            'Isolation levels (READ_UNCOMMITTED, READ_COMMITTED, REPEATABLE_READ, SERIALIZABLE)',
+            'Lazy vs Eager loading',
+            'Dirty checking',
+            'Optimistic & Pessimistic locking',
+            'N+1 problem & solutions',
+            'Transaction rollback'
+        ],
+        whyImportant: 'Advanced. Important for senior roles. Data consistency is critical in production.',
+        resources: [
+            { name: 'Baeldung Transactions', type: 'Article', url: 'https://www.baeldung.com/spring-transactional' },
+            { name: 'Hibernate Complete Guide', type: 'Article', url: 'https://www.baeldung.com/hibernate-tutorial' },
+            { name: 'Transactions Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=mnfJyoXvJTQ' }
+        ]
+    },
+    {
+        id: 15,
+        topic: 'springboot',
+        title: 'Spring Security & Authentication',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: 'Security: Spring Security, JWT, OAuth2, Roles, Permissions, Password encoding, Authentication',
+        subtopics: [
+            'Spring Security configuration',
+            'Authentication & Authorization',
+            'JWT tokens (creation, validation, refresh)',
+            'OAuth2 basics',
+            'Role-based access control (RBAC)',
+            'Password encoding (BCrypt, PBKDF2)',
+            'Security filters & SecurityContext',
+            'CORS & CSRF protection'
+        ],
+        whyImportant: 'Critical for production apps. Shows security awareness. Important for Whoville.',
+        resources: [
+            { name: 'Spring Security Docs', type: 'Docs', url: 'https://spring.io/projects/spring-security' },
+            { name: 'Baeldung Spring Security', type: 'Article', url: 'https://www.baeldung.com/spring-security-authentication-and-authorization' },
+            { name: 'JWT Authentication', type: 'Video', url: 'https://www.youtube.com/watch?v=X80nJ5T7YpE' }
+        ]
+    },
+    {
+        id: 16,
+        topic: 'springboot',
+        title: 'Logging & Monitoring',
+        difficulty: 'intermediate',
+        interview: false,
+        core: true,
+        importance: 'medium',
+        learningTime: '1 week',
+        description: 'Observability: Logging frameworks, Logback, SLF4J, Log levels, Monitoring, Actuator',
+        subtopics: [
+            'SLF4J & Logback',
+            'Log levels (DEBUG, INFO, WARN, ERROR)',
+            'Structured logging',
+            'Spring Boot Actuator',
+            'Health checks',
+            'Metrics collection',
+            'Distributed tracing basics'
+        ],
+        whyImportant: 'Essential in production. Shows professionalism. Debugging skills are critical.',
+        resources: [
+            { name: 'Baeldung Logging', type: 'Article', url: 'https://www.baeldung.com/spring-boot-logging' },
+            { name: 'Spring Boot Actuator', type: 'Article', url: 'https://www.baeldung.com/spring-boot-actuators' },
+            { name: 'Logging Best Practices', type: 'Video', url: 'https://www.youtube.com/watch?v=rVZMnNQ1aIQ' }
+        ]
+    },
+    {
+        id: 17,
+        topic: 'springboot',
+        title: 'Testing (Unit & Integration)',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Quality assurance: JUnit, Mockito, TestNG, @WebMvcTest, @DataJpaTest, TDD',
+        subtopics: [
+            'JUnit 4 & JUnit 5',
+            'Mockito for mocking',
+            'TestNG basics',
+            '@WebMvcTest for controllers',
+            '@DataJpaTest for repositories',
+            '@SpringBootTest for integration tests',
+            'Assertions & matchers',
+            'Test coverage'
+        ],
+        whyImportant: 'Shows quality mindset. Good developers write tests. Interview skill.',
+        resources: [
+            { name: 'Baeldung JUnit 5', type: 'Article', url: 'https://www.baeldung.com/junit-5' },
+            { name: 'Mockito Complete Guide', type: 'Article', url: 'https://www.baeldung.com/mockito-series' },
+            { name: 'Spring Boot Testing', type: 'Video', url: 'https://www.youtube.com/watch?v=6AjAG3FHLYA' }
+        ]
+    },
+
+    // ===== ANGULAR =====
+    {
+        id: 18,
+        topic: 'angular',
+        title: 'TypeScript Fundamentals',
+        difficulty: 'beginner',
+        interview: false,
+        core: true,
+        importance: 'high',
+        learningTime: '1-2 weeks',
+        description: 'Type system: Types, Interfaces, Classes, Enums, Generics, Decorators, Union types',
+        subtopics: [
+            'Basic types (string, number, boolean, any)',
+            'Interfaces & type checking',
+            'Classes & inheritance',
+            'Enums',
+            'Generics',
+            'Decorators',
+            'Union & Intersection types',
+            'Type assertions'
+        ],
+        whyImportant: 'Required for Angular. Weak TypeScript skills hurt code quality & development speed.',
+        resources: [
+            { name: 'TypeScript Handbook', type: 'Docs', url: 'https://www.typescriptlang.org/docs/' },
+            { name: 'TypeScript in 100 Seconds', type: 'Video', url: 'https://www.youtube.com/watch?v=qwfE7-NdUmQ' },
+            { name: 'GeeksforGeeks TypeScript', type: 'Article', url: 'https://www.geeksforgeeks.org/introduction-to-typescript/' }
+        ]
+    },
+    {
+        id: 19,
+        topic: 'angular',
+        title: 'Components & Templates',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Building blocks: Components, Templates, Data binding, Directives, Lifecycle hooks',
+        subtopics: [
+            'Component architecture',
+            'Template syntax',
+            'Interpolation {{}}',
+            'Property binding []',
+            'Event binding ()',
+            'Two-way binding [()]',
+            '*ngIf, *ngFor directives',
+            'Lifecycle hooks (ngOnInit, ngOnDestroy, ngOnChanges)'
+        ],
+        whyImportant: 'Fundamental to Angular. Whoville heavily uses this. Core of UI development.',
+        resources: [
+            { name: 'Angular.io - Components', type: 'Docs', url: 'https://angular.io/guide/component-overview' },
+            { name: 'Angular Components Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=13L2b0k3pv0' },
+            { name: 'Telusko Angular Components', type: 'Video', url: 'https://www.youtube.com/watch?v=XRnNxzAakCU' }
+        ]
+    },
+    {
+        id: 20,
+        topic: 'angular',
+        title: 'Services & Dependency Injection',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: '@Injectable, Service creation, DI, Singleton pattern, Hierarchical injector, sharing data',
+        subtopics: [
+            '@Injectable decorator',
+            'Service creation & patterns',
+            'Dependency Injection mechanism',
+            'Hierarchical injectors',
+            'Singleton services',
+            'Sharing data between components',
+            'Service lifecycle',
+            'Providein root vs module'
+        ],
+        whyImportant: 'Core architectural pattern. Essential for scalable apps. Required for Whoville.',
+        resources: [
+            { name: 'Angular.io - Services', type: 'Docs', url: 'https://angular.io/guide/architecture-services' },
+            { name: 'Services Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=LM35hT-TvEE' },
+            { name: 'Telusko Services', type: 'Video', url: 'https://www.youtube.com/watch?v=P0bQcH7MXH0' }
+        ]
+    },
+    {
+        id: 21,
+        topic: 'angular',
+        title: 'Routing & Navigation',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Multi-page apps: Routes, Navigation, Guards, Lazy loading, Resolvers, Route parameters',
+        subtopics: [
+            'Route configuration & RouterModule',
+            'RouterLink & navigate()',
+            'Route parameters & query strings',
+            'Route guards (canActivate, canDeactivate, canLoad)',
+            'Lazy loading modules',
+            'Resolvers for data loading',
+            'Wildcard routes',
+            'Route order importance'
+        ],
+        whyImportant: 'Essential for multi-page apps. Whoville needs proper routing. Shows architecture sense.',
+        resources: [
+            { name: 'Angular.io - Routing', type: 'Docs', url: 'https://angular.io/guide/router' },
+            { name: 'Angular Routing Complete', type: 'Video', url: 'https://www.youtube.com/watch?v=R-mLGKQUnFo' },
+            { name: 'Telusko Routing', type: 'Video', url: 'https://www.youtube.com/watch?v=NaFi7lKMp70' }
+        ]
+    },
+    {
+        id: 22,
+        topic: 'angular',
+        title: 'Forms & Validation',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'User input: Template-driven forms, Reactive forms, Form controls, Validation, Custom validators',
+        subtopics: [
+            'Template-driven forms',
+            'Reactive forms & FormBuilder',
+            'FormControl, FormGroup, FormArray',
+            'Built-in validators (@Required, @Email, pattern)',
+            'Custom validators',
+            'Async validators',
+            'Form submission & reset',
+            'Touched, dirty, pristine states'
+        ],
+        whyImportant: 'Every app has forms. Reactive forms are industry standard. Critical for Whoville.',
+        resources: [
+            { name: 'Angular.io - Forms', type: 'Docs', url: 'https://angular.io/guide/forms-overview' },
+            { name: 'Reactive Forms Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=JjU4BZdq4_o' },
+            { name: 'Forms Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=DEDYQl2yWF8' }
+        ]
+    },
+    {
+        id: 23,
+        topic: 'angular',
+        title: 'HTTP Client & APIs',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Backend communication: HttpClient, HTTP methods, Interceptors, Error handling, Request headers',
+        subtopics: [
+            'HttpClient module & injection',
+            'GET, POST, PUT, DELETE requests',
+            'Request/Response types',
+            'HTTP Interceptors (auth, error, logging)',
+            'Global error handling',
+            'Request headers & authentication',
+            'Timeout handling',
+            'Typed responses'
+        ],
+        whyImportant: 'Every Angular app talks to APIs. Whoville needs this for backend integration.',
+        resources: [
+            { name: 'Angular.io - HTTP Client', type: 'Docs', url: 'https://angular.io/guide/http' },
+            { name: 'HTTP Client Complete', type: 'Video', url: 'https://www.youtube.com/watch?v=xj2SFv8yRJY' },
+            { name: 'API Integration', type: 'Video', url: 'https://www.youtube.com/watch?v=X8oQFxRh6xY' }
+        ]
+    },
+    {
+        id: 24,
+        topic: 'angular',
+        title: 'RxJS & Observables',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: 'Reactive programming: Observables, Subjects, Operators, Subscriptions, Async pipe, Memory management',
+        subtopics: [
+            'Observables vs Promises',
+            'Subjects & BehaviorSubject',
+            'Common operators (map, filter, switchMap, mergeMap, catchError)',
+            'Unsubscribe & memory leaks',
+            'Async pipe',
+            'Higher-order observables',
+            'Error handling in streams',
+            'Multicasting'
+        ],
+        whyImportant: 'Complex but essential. Senior Angular developers master this. Advanced interviews ask.',
+        resources: [
+            { name: 'Angular.io - RxJS', type: 'Docs', url: 'https://angular.io/guide/rx-library' },
+            { name: 'RxJS Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=PhggNGsSQyQ' },
+            { name: 'RxJS Operators', type: 'Video', url: 'https://www.youtube.com/watch?v=ZMPF2ZF-TDc' }
+        ]
+    },
+    {
+        id: 25,
+        topic: 'angular',
+        title: 'State Management (NgRx)',
+        difficulty: 'advanced',
+        interview: false,
+        core: false,
+        importance: 'medium',
+        learningTime: '2 weeks',
+        description: 'Scalable state: Redux pattern, NgRx store, Actions, Reducers, Effects, Selectors',
+        subtopics: [
+            'Redux concepts',
+            'NgRx store setup',
+            'Actions & action creators',
+            'Reducers & pure functions',
+            'Effects for side effects',
+            'Selectors for derived state',
+            'Entity adapter',
+            'Store devtools'
+        ],
+        whyImportant: 'For large apps with complex state. Not always needed. Good to know for senior roles.',
+        resources: [
+            { name: 'NgRx Official Docs', type: 'Docs', url: 'https://ngrx.io/docs' },
+            { name: 'NgRx Store Complete', type: 'Video', url: 'https://www.youtube.com/watch?v=f97ICOaekNU' },
+            { name: 'Redux Pattern Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=3sjMRS1gJys' }
+        ]
+    },
+
+    // ===== REACT =====
+    {
+        id: 26,
+        topic: 'react',
+        title: 'React Fundamentals',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Basics: Components, JSX, Props, State, Rendering, Virtual DOM, Keys',
+        subtopics: [
+            'Functional vs Class components',
+            'JSX syntax & compilation',
+            'Props (passing data)',
+            'State & setState',
+            'Rendering logic',
+            'Virtual DOM & reconciliation',
+            'Keys in lists',
+            'Fragment'
+        ],
+        whyImportant: 'React is industry standard frontend. Many companies use it. Good alternative to Angular.',
+        resources: [
+            { name: 'React Official Docs', type: 'Docs', url: 'https://react.dev' },
+            { name: 'React Fundamentals (freeCodeCamp)', type: 'Video', url: 'https://www.youtube.com/watch?v=bMknfKc6r-c' },
+            { name: 'React Basics Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=wIyHSOugGGw' }
+        ]
+    },
+    {
+        id: 27,
+        topic: 'react',
+        title: 'Hooks (useState, useEffect, Custom)',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Modern React: Hooks, Side effects, State management, Custom hooks, Rules of hooks',
+        subtopics: [
+            'useState hook',
+            'useEffect for side effects',
+            'Dependency arrays',
+            'useContext for props drilling',
+            'useReducer for complex state',
+            'Custom hooks',
+            'useRef for DOM access',
+            'Rules of hooks'
+        ],
+        whyImportant: 'Modern React standard. Required knowledge for any React job. Powerful for state management.',
+        resources: [
+            { name: 'React Hooks Docs', type: 'Docs', url: 'https://react.dev/reference/react/hooks' },
+            { name: 'React Hooks Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=TlqKbLAMVvY' },
+            { name: 'useEffect Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=Q0CuFPwrb7U' }
+        ]
+    },
+    {
+        id: 28,
+        topic: 'react',
+        title: 'React Router',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'Navigation: Routes, Links, Nested routing, Dynamic routes, Route parameters',
+        subtopics: [
+            'BrowserRouter & Routes',
+            'Route component',
+            'Link & NavLink',
+            'useNavigate hook',
+            'Route parameters & query strings',
+            'Nested routes',
+            'Lazy loading',
+            'Protected routes'
+        ],
+        whyImportant: 'Essential for multi-page React apps. Standard approach for routing in React.',
+        resources: [
+            { name: 'React Router v6 Docs', type: 'Docs', url: 'https://reactrouter.com/en/main' },
+            { name: 'React Router Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=Ul3y1LXxzdU' },
+            { name: 'React Router Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=oUZjO00NkhY' }
+        ]
+    },
+    {
+        id: 29,
+        topic: 'react',
+        title: 'State Management (Redux/Context)',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Scalable state: Redux, Context API, Redux Toolkit, Actions, Reducers, Selectors',
+        subtopics: [
+            'Context API setup',
+            'Redux store & dispatch',
+            'Actions & action creators',
+            'Reducers & pure functions',
+            'Redux Thunk for async',
+            'Redux Toolkit (modern)',
+            'useSelector & useDispatch hooks',
+            'Middleware'
+        ],
+        whyImportant: 'Critical for larger apps. Shows understanding of state patterns. Interview standard.',
+        resources: [
+            { name: 'Redux Official Docs', type: 'Docs', url: 'https://redux.js.org/' },
+            { name: 'Redux Toolkit', type: 'Docs', url: 'https://redux-toolkit.js.org/' },
+            { name: 'Redux Crash Course', type: 'Video', url: 'https://www.youtube.com/watch?v=iBUJVoCIObs' }
+        ]
+    },
+    {
+        id: 30,
+        topic: 'react',
+        title: 'Fetch & Axios (API Integration)',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'Backend communication: Fetch API, Axios, Error handling, Request/Response, Authentication',
+        subtopics: [
+            'Fetch API basics',
+            'Axios library & configuration',
+            'GET, POST, PUT, DELETE requests',
+            'Error handling & status codes',
+            'Request interceptors',
+            'Timeouts & retries',
+            'Authentication headers',
+            'Loading & error states'
+        ],
+        whyImportant: 'Every React app talks to APIs. Essential for backend integration. Shows real-world skills.',
+        resources: [
+            { name: 'MDN Fetch API', type: 'Docs', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API' },
+            { name: 'Axios Documentation', type: 'Docs', url: 'https://axios-http.com/docs/intro' },
+            { name: 'React API Calls', type: 'Video', url: 'https://www.youtube.com/watch?v=wCYN3uMv3s8' }
+        ]
+    },
+    {
+        id: 31,
+        topic: 'react',
+        title: 'Performance & Optimization',
+        difficulty: 'advanced',
+        interview: true,
+        core: false,
+        importance: 'medium',
+        learningTime: '1.5 weeks',
+        description: 'Advanced: Memoization, lazy loading, code splitting, React.memo, useMemo, useCallback',
+        subtopics: [
+            'Re-render optimization',
+            'React.memo for component memoization',
+            'useMemo & useCallback',
+            'Code splitting & lazy loading',
+            'Tree shaking',
+            'Production build optimization',
+            'React DevTools profiler'
+        ],
+        whyImportant: 'Advanced topic. Shows deep understanding. Important for senior roles & large apps.',
+        resources: [
+            { name: 'React Performance Docs', type: 'Docs', url: 'https://react.dev/learn/render-and-commit' },
+            { name: 'React Optimization Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=8tqV6o2Wq_Q' },
+            { name: 'useMemo & useCallback', type: 'Video', url: 'https://www.youtube.com/watch?v=THL1OPn7YGI' }
+        ]
+    },
+
+    // ===== SQL =====
+    {
+        id: 32,
+        topic: 'sql',
+        title: 'SQL Basics & CRUD',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Foundation: SELECT, INSERT, UPDATE, DELETE, WHERE, ORDER BY, LIMIT',
+        subtopics: [
+            'SELECT statement & columns',
+            'WHERE clause & conditions',
+            'INSERT new records',
+            'UPDATE existing data',
+            'DELETE records',
+            'ORDER BY & sorting',
+            'LIMIT & pagination',
+            'DISTINCT & aggregation'
+        ],
+        whyImportant: 'Absolutely fundamental. Every developer needs this. Whoville requires strong SQL.',
+        resources: [
+            { name: 'SQL Tutorial (W3Schools)', type: 'Article', url: 'https://www.w3schools.com/sql/' },
+            { name: 'GeeksforGeeks SQL', type: 'Article', url: 'https://www.geeksforgeeks.org/sql-tutorial/' },
+            { name: 'SQL Basics (freeCodeCamp)', type: 'Video', url: 'https://www.youtube.com/watch?v=9Pzj7Aj25lw' }
+        ]
+    },
+    {
+        id: 33,
+        topic: 'sql',
+        title: 'Joins & Relationships',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Combining tables: INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL JOIN, CROSS JOIN, aliases',
+        subtopics: [
+            'INNER JOIN',
+            'LEFT JOIN (LEFT OUTER)',
+            'RIGHT JOIN (RIGHT OUTER)',
+            'FULL JOIN (FULL OUTER)',
+            'CROSS JOIN',
+            'Self join',
+            'Table aliases',
+            'Multiple joins'
+        ],
+        whyImportant: 'Critical for real-world queries. Almost every query needs joins. Interview essential.',
+        resources: [
+            { name: 'SQL Joins Explained', type: 'Article', url: 'https://www.w3schools.com/sql/sql_join.asp' },
+            { name: 'GeeksforGeeks Joins', type: 'Article', url: 'https://www.geeksforgeeks.org/sql-join-types/' },
+            { name: 'SQL Joins Visual', type: 'Video', url: 'https://www.youtube.com/watch?v=9yeOJ0ZS0wQ' }
+        ]
+    },
+    {
+        id: 34,
+        topic: 'sql',
+        title: 'Aggregation & Grouping',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'Data analysis: COUNT, SUM, AVG, MAX, MIN, GROUP BY, HAVING',
+        subtopics: [
+            'COUNT function',
+            'SUM & AVG',
+            'MAX & MIN',
+            'GROUP BY clause',
+            'HAVING clause',
+            'Group by multiple columns',
+            'Aggregate with NULL handling'
+        ],
+        whyImportant: 'Essential for reports & analytics. Whoville likely needs aggregation queries.',
+        resources: [
+            { name: 'SQL Aggregation', type: 'Article', url: 'https://www.w3schools.com/sql/sql_count_avg_sum.asp' },
+            { name: 'GROUP BY Explained', type: 'Article', url: 'https://www.geeksforgeeks.org/sql-group-by/' },
+            { name: 'Aggregation Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=x-tpqJlr0Zw' }
+        ]
+    },
+    {
+        id: 35,
+        topic: 'sql',
+        title: 'Subqueries & Advanced Queries',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Complex queries: Subqueries, CTEs, EXISTS, IN, CASE, Window functions',
+        subtopics: [
+            'Subqueries in SELECT, WHERE, FROM',
+            'Correlated subqueries',
+            'EXISTS operator',
+            'IN operator with subquery',
+            'CASE statements',
+            'Common Table Expressions (CTEs)',
+            'Window functions (ROW_NUMBER, RANK, LAG, LEAD)',
+            'Query optimization'
+        ],
+        whyImportant: 'Advanced SQL. Shows real database skills. Whoville complex queries likely need this.',
+        resources: [
+            { name: 'SQL Subqueries', type: 'Article', url: 'https://www.w3schools.com/sql/sql_sub_select.asp' },
+            { name: 'Window Functions Explained', type: 'Article', url: 'https://www.geeksforgeeks.org/sql-window-functions/' },
+            { name: 'Advanced SQL', type: 'Video', url: 'https://www.youtube.com/watch?v=lJYJW5LQwAE' }
+        ]
+    },
+    {
+        id: 36,
+        topic: 'sql',
+        title: 'Indexes & Query Optimization',
+        difficulty: 'advanced',
+        interview: true,
+        core: false,
+        importance: 'medium',
+        learningTime: '1.5 weeks',
+        description: 'Performance: Indexes, Query plans, EXPLAIN, Optimization techniques, Best practices',
+        subtopics: [
+            'Index types (B-tree, hash)',
+            'Primary key index',
+            'Composite indexes',
+            'EXPLAIN statement',
+            'Query execution plans',
+            'Index optimization strategies',
+            'N+1 problem solutions',
+            'Query hints'
+        ],
+        whyImportant: 'Performance is critical. Shows optimization mindset. Important for senior roles.',
+        resources: [
+            { name: 'SQL Indexes', type: 'Article', url: 'https://www.geeksforgeeks.org/sql-indexes/' },
+            { name: 'Query Optimization Guide', type: 'Article', url: 'https://use-the-index-luke.com/' },
+            { name: 'Database Performance', type: 'Video', url: 'https://www.youtube.com/watch?v=U3iR0oLmK_4' }
+        ]
+    },
+    {
+        id: 37,
+        topic: 'sql',
+        title: 'Transactions & ACID',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'Data integrity: Transactions, COMMIT, ROLLBACK, ACID properties, Isolation levels',
+        subtopics: [
+            'Transaction concept',
+            'COMMIT & ROLLBACK',
+            'ACID properties (Atomicity, Consistency, Isolation, Durability)',
+            'Isolation levels',
+            'Deadlocks & solutions',
+            'Transaction logs',
+            'Savepoints'
+        ],
+        whyImportant: 'Critical for data consistency. Shows understanding of databases. Advanced interview question.',
+        resources: [
+            { name: 'SQL Transactions', type: 'Article', url: 'https://www.geeksforgeeks.org/sql-transactions/' },
+            { name: 'ACID Properties', type: 'Article', url: 'https://www.baeldung.com/cs/acid-transactions' },
+            { name: 'Transaction Management', type: 'Video', url: 'https://www.youtube.com/watch?v=SbQ5Pf-Yfg0' }
+        ]
+    },
+
+    // ===== DSA =====
+    {
+        id: 38,
+        topic: 'dsa',
+        title: 'Arrays & Strings',
+        difficulty: 'beginner',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Basics: Array operations, String manipulation, Two-pointer, Sliding window, Prefix sum',
+        subtopics: [
+            'Array traversal & manipulation',
+            'String methods & operations',
+            'Two-pointer technique',
+            'Sliding window pattern',
+            'Prefix sum & cumulative sum',
+            'Reverse & rotate arrays',
+            'Remove duplicates'
+        ],
+        whyImportant: '90% of easy interview problems. Essential foundation. Practice these heavily.',
+        resources: [
+            { name: 'NeetCode Arrays', type: 'Article', url: 'https://neetcode.io/roadmap' },
+            { name: 'LeetCode Easy Arrays', type: 'Practice', url: 'https://leetcode.com/problems/two-sum/' },
+            { name: 'Array Algorithms', type: 'Article', url: 'https://www.geeksforgeeks.org/fundamentals-of-algorithms/' }
+        ]
+    },
+    {
+        id: 39,
+        topic: 'dsa',
+        title: 'Sorting & Searching',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Algorithms: Bubble sort, Merge sort, Quick sort, Binary search, Hash maps',
+        subtopics: [
+            'Bubble sort & selection sort',
+            'Merge sort & time complexity',
+            'Quick sort & partitioning',
+            'Binary search implementation',
+            'Hash map/set usage',
+            'Frequency counting',
+            'Sorting algorithms analysis'
+        ],
+        whyImportant: 'Common in interviews. Understanding sorting is critical. Every good developer knows these.',
+        resources: [
+            { name: 'GeeksforGeeks Sorting', type: 'Article', url: 'https://www.geeksforgeeks.org/sorting-algorithms/' },
+            { name: 'Sorting Explained Visually', type: 'Video', url: 'https://www.youtube.com/watch?v=kPRA0W1kEyg' },
+            { name: 'LeetCode Sorting', type: 'Practice', url: 'https://leetcode.com/problems/merge-sorted-array/' }
+        ]
+    },
+    {
+        id: 40,
+        topic: 'dsa',
+        title: 'Recursion & Backtracking',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Problem solving: Base case, Recursive calls, Backtracking, Tree traversal, Permutations',
+        subtopics: [
+            'Recursion principles',
+            'Base & recursive case',
+            'Backtracking pattern',
+            'Tree & graph traversal',
+            'Combinations & permutations',
+            'Generating sequences',
+            'Pruning strategies'
+        ],
+        whyImportant: 'Fundamental for advanced problems. Shows problem-solving maturity. Critical concept.',
+        resources: [
+            { name: 'GeeksforGeeks Recursion', type: 'Article', url: 'https://www.geeksforgeeks.org/recursion/' },
+            { name: 'Recursion Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=IJDJ0kBx2LM' },
+            { name: 'LeetCode Recursion', type: 'Practice', url: 'https://leetcode.com/problems/combination-sum/' }
+        ]
+    },
+    {
+        id: 41,
+        topic: 'dsa',
+        title: 'Linked Lists',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'Data structure: Node, Singly linked list, Doubly linked list, Cycles, Reversal',
+        subtopics: [
+            'Node structure & pointers',
+            'Singly linked list operations',
+            'Doubly linked list',
+            'Cycle detection (Floyd algorithm)',
+            'Reversing a linked list',
+            'Merging linked lists',
+            'Fast & slow pointers'
+        ],
+        whyImportant: 'Classic data structure. Linked list problems common in interviews. Teaches pointers.',
+        resources: [
+            { name: 'GeeksforGeeks Linked Lists', type: 'Article', url: 'https://www.geeksforgeeks.org/data-structures/linked-list/' },
+            { name: 'Linked Lists Deep Dive', type: 'Video', url: 'https://www.youtube.com/watch?v=F8AbOfQwl1c' },
+            { name: 'LeetCode Linked Lists', type: 'Practice', url: 'https://leetcode.com/problems/reverse-linked-list/' }
+        ]
+    },
+    {
+        id: 42,
+        topic: 'dsa',
+        title: 'Stacks & Queues',
+        difficulty: 'intermediate',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '1.5 weeks',
+        description: 'LIFO & FIFO: Stack, Queue, Deque, Applications (parentheses, BFS, monotonic)',
+        subtopics: [
+            'Stack LIFO concept',
+            'Queue FIFO concept',
+            'Deque (double-ended)',
+            'Monotonic stack',
+            'Valid parentheses problems',
+            'BFS using queue',
+            'DFS using stack'
+        ],
+        whyImportant: 'Fundamental structures. Used in real algorithms (BFS, DFS, parsers). Interview standard.',
+        resources: [
+            { name: 'GeeksforGeeks Stacks', type: 'Article', url: 'https://www.geeksforgeeks.org/stack-data-structure/' },
+            { name: 'Stacks & Queues', type: 'Video', url: 'https://www.youtube.com/watch?v=Xo54nWRyE5o' },
+            { name: 'LeetCode Stack Problems', type: 'Practice', url: 'https://leetcode.com/problems/valid-parentheses/' }
+        ]
+    },
+    {
+        id: 43,
+        topic: 'dsa',
+        title: 'Trees & Binary Search Trees',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '3 weeks',
+        description: 'Hierarchical data: Binary trees, BST, Traversals, DFS, BFS, Balanced trees, Insertion/Deletion',
+        subtopics: [
+            'Binary tree structure',
+            'Binary Search Tree properties',
+            'In-order, Pre-order, Post-order traversals',
+            'Level-order (BFS)',
+            'DFS vs BFS',
+            'Tree insertion & deletion',
+            'Lowest common ancestor (LCA)',
+            'Balanced BST (AVL, Red-Black trees basics)'
+        ],
+        whyImportant: 'Advanced structure. Tree problems very common in interviews. Critical for Senior roles.',
+        resources: [
+            { name: 'GeeksforGeeks Trees', type: 'Article', url: 'https://www.geeksforgeeks.org/binary-tree-data-structure/' },
+            { name: 'Trees Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=XJ3Q1PCaKHE' },
+            { name: 'LeetCode Trees', type: 'Practice', url: 'https://leetcode.com/problems/binary-tree-inorder-traversal/' }
+        ]
+    },
+    {
+        id: 44,
+        topic: 'dsa',
+        title: 'Graphs & Graph Algorithms',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '3 weeks',
+        description: 'Network data: Graph representation, DFS, BFS, Shortest path (Dijkstra), Topological sort',
+        subtopics: [
+            'Graph representation (adjacency list, matrix)',
+            'DFS traversal',
+            'BFS traversal',
+            'Dijkstra shortest path',
+            'Bellman-Ford algorithm',
+            'Topological sorting',
+            'Cycle detection',
+            'Connected components'
+        ],
+        whyImportant: 'Advanced topic. System design & real-world apps use graphs. Senior interview topic.',
+        resources: [
+            { name: 'GeeksforGeeks Graphs', type: 'Article', url: 'https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/' },
+            { name: 'Graphs Algorithms', type: 'Video', url: 'https://www.youtube.com/watch?v=V6sPjfwc1sc' },
+            { name: 'LeetCode Graphs', type: 'Practice', url: 'https://leetcode.com/problems/number-of-islands/' }
+        ]
+    },
+    {
+        id: 45,
+        topic: 'dsa',
+        title: 'Dynamic Programming',
+        difficulty: 'advanced',
+        interview: true,
+        core: true,
+        importance: 'high',
+        learningTime: '3-4 weeks',
+        description: 'Optimization: Overlapping subproblems, Memoization, Tabulation, Classic problems',
+        subtopics: [
+            'Overlapping subproblems',
+            'Memoization technique',
+            'Tabulation (bottom-up)',
+            'State definition & transitions',
+            'Fibonacci, Coin change, Knapsack',
+            'Longest increasing subsequence',
+            'Edit distance problems',
+            '2D DP problems'
+        ],
+        whyImportant: 'Most challenging. Shows algorithmic thinking. Expected in advanced interviews.',
+        resources: [
+            { name: 'GeeksforGeeks DP', type: 'Article', url: 'https://www.geeksforgeeks.org/dynamic-programming/' },
+            { name: 'DP Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=oBt53YbR9Kk' },
+            { name: 'LeetCode DP', type: 'Practice', url: 'https://leetcode.com/problems/climbing-stairs/' }
+        ]
+    },
+    {
+        id: 46,
+        topic: 'dsa',
+        title: 'Trie & Hash Tables',
+        difficulty: 'advanced',
+        interview: true,
+        core: false,
+        importance: 'medium',
+        learningTime: '1.5 weeks',
+        description: 'Specialized structures: Trie (prefix tree), Hash functions, Collision handling, Applications',
+        subtopics: [
+            'Trie (prefix tree) structure',
+            'Trie insertion & search',
+            'Word search problems',
+            'Hash table design',
+            'Hash function properties',
+            'Collision resolution',
+            'Load factor'
+        ],
+        whyImportant: 'Advanced. Used in auto-complete, spell checkers, IP routing. Shows deep knowledge.',
+        resources: [
+            { name: 'GeeksforGeeks Trie', type: 'Article', url: 'https://www.geeksforgeeks.org/trie-insert-and-search/' },
+            { name: 'Trie Data Structure', type: 'Video', url: 'https://www.youtube.com/watch?v=zIjfhVPRZCg' },
+            { name: 'LeetCode Trie', type: 'Practice', url: 'https://leetcode.com/problems/implement-trie-prefix-tree/' }
+        ]
+    },
+
+    // ===== DEVOPS =====
+    {
+        id: 47,
+        topic: 'devops',
+        title: 'Git & GitHub Basics',
+        difficulty: 'beginner',
+        interview: false,
+        core: true,
+        importance: 'high',
+        learningTime: '1 week',
+        description: 'Version control: Repositories, Branches, Commits, Pull Requests, Merging',
+        subtopics: [
+            'Git initialization & cloning',
+            'Staging & committing',
+            'Branching strategies (main, develop, feature)',
+            'Merging & conflict resolution',
+            'Pull requests & code review',
+            'Git rebase vs merge',
+            'Stashing & cherry-pick'
+        ],
+        whyImportant: 'Essential for every developer. Required for Whoville team collaboration.',
+        resources: [
+            { name: 'GitHub Learning Lab', type: 'Interactive', url: 'https://github.com/skills' },
+            { name: 'Git Official Docs', type: 'Docs', url: 'https://git-scm.com/doc' },
+            { name: 'Git & GitHub Crash Course', type: 'Video', url: 'https://www.youtube.com/watch?v=RGOj5yH7evk' }
+        ]
+    },
+    {
+        id: 48,
+        topic: 'devops',
+        title: 'Linux & Command Line',
+        difficulty: 'beginner',
+        interview: false,
+        core: true,
+        importance: 'medium',
+        learningTime: '1.5 weeks',
+        description: 'OS fundamentals: File system, Permissions, Shell commands, Scripting basics',
+        subtopics: [
+            'File system navigation',
+            'File permissions (chmod, chown)',
+            'Basic commands (ls, cd, cp, mv, rm)',
+            'Pipes & redirection',
+            'Shell scripting basics',
+            'Package management (apt, yum)',
+            'Process management'
+        ],
+        whyImportant: 'Required for deployment & server work. Every developer should know basics.',
+        resources: [
+            { name: 'Ubuntu Documentation', type: 'Docs', url: 'https://help.ubuntu.com/' },
+            { name: 'Linux Command Line Basics', type: 'Video', url: 'https://www.youtube.com/watch?v=sIqKGQ2nspU' },
+            { name: 'GeeksforGeeks Linux', type: 'Article', url: 'https://www.geeksforgeeks.org/linux-tutorial/' }
+        ]
+    },
+    {
+        id: 49,
+        topic: 'devops',
+        title: 'Docker & Containerization',
+        difficulty: 'intermediate',
+        interview: false,
+        core: true,
+        importance: 'high',
+        learningTime: '2 weeks',
+        description: 'Containers: Docker images, Containers, Dockerfile, Docker Compose, Container Registry',
+        subtopics: [
+            'Docker concepts & architecture',
+            'Images & containers',
+            'Dockerfile creation',
+            'Docker Compose for multi-container',
+            'Container networking',
+            'Volumes & data persistence',
+            'Docker Hub & registries'
+        ],
+        whyImportant: 'Industry standard. Essential for modern deployment. Whoville likely uses Docker.',
+        resources: [
+            { name: 'Docker Official Docs', type: 'Docs', url: 'https://docs.docker.com/' },
+            { name: 'Docker Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=fqMOX6JJhGo' },
+            { name: 'Telusko Docker', type: 'Video', url: 'https://www.youtube.com/watch?v=17Bl31rlnRM' }
+        ]
+    },
+    {
+        id: 50,
+        topic: 'devops',
+        title: 'AWS Fundamentals',
+        difficulty: 'intermediate',
+        interview: false,
+        core: true,
+        importance: 'high',
+        learningTime: '2-3 weeks',
+        description: 'Cloud: EC2, RDS, S3, Lambda, VPC, IAM, CloudWatch, Load Balancing',
+        subtopics: [
+            'EC2 instances & launch',
+            'RDS databases',
+            'S3 storage buckets',
+            'Lambda serverless',
+            'VPC & networking',
+            'IAM users & permissions',
+            'CloudWatch monitoring',
+            'Auto scaling'
+        ],
+        whyImportant: 'Whoville runs on AWS. Essential knowledge for your project. Cloud skills required.',
+        resources: [
+            { name: 'AWS Skill Builder (Free)', type: 'Learning', url: 'https://skillbuilder.aws.com/' },
+            { name: 'AWS for Beginners', type: 'Video', url: 'https://www.youtube.com/watch?v=k1RI5locZE4' },
+            { name: 'Telusko AWS Course', type: 'Video', url: 'https://www.youtube.com/watch?v=Z5XOHBI0x78' }
+        ]
+    },
+    {
+        id: 51,
+        topic: 'devops',
+        title: 'CI/CD Pipelines',
+        difficulty: 'intermediate',
+        interview: false,
+        core: true,
+        importance: 'medium',
+        learningTime: '1.5 weeks',
+        description: 'Automation: GitHub Actions, Jenkins, Build, Test, Deploy automation',
+        subtopics: [
+            'CI/CD concepts',
+            'GitHub Actions workflows',
+            'Jenkins pipeline',
+            'Build automation',
+            'Automated testing in pipeline',
+            'Deployment strategies (blue-green, canary)',
+            'Monitoring deployments'
+        ],
+        whyImportant: 'Modern development standard. Shows DevOps thinking. Whoville likely has CI/CD.",
+        resources: [
+            { name: 'GitHub Actions Docs', type: 'Docs', url: 'https://docs.github.com/en/actions' },
+            { name: 'CI/CD Explained', type: 'Video', url: 'https://www.youtube.com/watch?v=scEDHM3RIpM' },
+            { name: 'Jenkins Complete Guide', type: 'Video', url: 'https://www.youtube.com/watch?v=7KCS70sCoK0' }
+        ]
+    },
+    {
+        id: 52,
+        topic: 'devops',
+        title: 'Kubernetes Basics',
+        difficulty: 'advanced',
+        interview: false,
+        core: false,
+        importance: 'low',
+        learningTime: '2-3 weeks',
+        description: 'Orchestration: Pods, Services, Deployments, ConfigMaps, Scaling, Health checks',
+        subtopics: [
+            'Kubernetes concepts',
+            'Pods & containers',
+            'Services & networking',
+            'Deployments & rolling updates',
+            'ConfigMaps & Secrets',
+            'Persistent volumes',
+            'Helm charts'
+        ],
+        whyImportant: 'Advanced. For large-scale deployments. Not immediately needed but good to know.',
+        resources: [
+            { name: 'Kubernetes Official Docs', type: 'Docs', url: 'https://kubernetes.io/docs/' },
+            { name: 'Kubernetes Tutorial', type: 'Video', url: 'https://www.youtube.com/watch?v=s_o8dwzRlu4' },
+            { name: 'Docker & Kubernetes', type: 'Video', url: 'https://www.youtube.com/watch?v=kTp5xUtEKMA' }
+        ]
+    }
+];
+
+function renderTopics(filter = 'all') {
+    const container = document.getElementById('topicsContainer');
+    container.innerHTML = '';
+
+    const filtered = filter === 'all' 
+        ? topicsData 
+        : topicsData.filter(t => t.topic === filter);
+
+    filtered.forEach(topic => {
+        const card = document.createElement('div');
+        card.className = 'topic-card';
+
+        const badges = [];
+        if (topic.interview) badges.push(`<span class="interview-badge">INTERVIEW</span>`);
+        if (topic.core) badges.push(`<span class="core-badge">CORE</span>`);
+
+        const topicsHtml = topic.subtopics
+            .map(t => `<div class="topic-item">${t}</div>`)
+            .join('');
+
+        const resourcesHtml = topic.resources
+            .map(r => `
+                <a href="${r.url}" target="_blank" class="resource-link">
+                    <span class="resource-type">${r.type}</span>${r.name}
+                </a>
+            `)
+            .join('');
+
+        const importanceMap = { high: 90, medium: 70, low: 50 };
+        const importanceWidth = importanceMap[topic.importance] || 70;
+
+        card.innerHTML = `
+            <div class="card-header">
+                <div class="card-title">${topic.title}</div>
+                <div class="badge-group">
+                    <span class="difficulty-badge difficulty-${topic.difficulty}">${topic.difficulty.toUpperCase()}</span>
+                    ${badges.join('')}
+                </div>
+            </div>
+            <div class="card-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">⏱️</span>
+                    <span>${topic.learningTime}</span>
+                </div>
+            </div>
+            <div class="card-description">${topic.description}</div>
+            <div class="importance-bar ${topic.importance}">
+                <span class="importance-label">Importance</span>
+                <div class="importance-fill"></div>
+            </div>
+            <div class="card-section">
+                <div class="section-title">📖 What to learn</div>
+                <div class="topics-list">${topicsHtml}</div>
+            </div>
+            <div class="card-section">
+                <div class="learning-path">
+                    <strong>Why important:</strong> ${topic.whyImportant}
+                </div>
+            </div>
+            <div class="resources">
+                <div class="resource-header">📚 Best Resources</div>
+                ${resourcesHtml}
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function filterTopic(topic) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderTopics(topic);
+}
+
+// Initial render
+renderTopics();
+</script>
+
+</body>
+</html>

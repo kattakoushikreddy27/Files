@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BookGram</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(async()=>{
+  try{
+    const r=await fetch('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js');
+    const t=await r.text();
+    pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([t],{type:'application/javascript'}));
+  }catch(e){ pdfjsLib.GlobalWorkerOptions.workerSrc=''; }
+  window._pdfReady=true;
+})();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;}
+body{max-width:430px;margin:0 auto;position:relative;}
+
+/* ─── UPLOAD SCREEN ─── */
+#upload{
+  position:fixed;inset:0;z-index:900;background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;
+}
+.up-logo{
+  font-family:'Dancing Script',cursive;font-size:52px;font-weight:700;
+  background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+.up-sub{font-size:13px;color:#555;margin-bottom:48px;letter-spacing:.3px;}
+.up-dropzone{
+  width:100%;border:1.5px dashed #2a2a2a;border-radius:16px;padding:40px 20px;
+  text-align:center;cursor:pointer;position:relative;background:#0a0a0a;transition:border-color .2s;
+}
+.up-dropzone.drag{border-color:#0095f6;}
+.up-dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.up-icon{
+  width:64px;height:64px;margin:0 auto 16px;border-radius:16px;
+  background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.up-dropzone h3{font-size:17px;font-weight:600;margin-bottom:6px;}
+.up-dropzone p{font-size:13px;color:#555;line-height:1.5;}
+.up-btn{
+  margin-top:20px;width:100%;padding:13px;border-radius:8px;border:none;
+  background:#0095f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;
+}
+.up-pills{display:flex;gap:8px;justify-content:center;margin-top:18px;}
+.up-pill{padding:5px 14px;border-radius:20px;background:#161616;border:1px solid #222;font-size:12px;color:#666;}
+
+/* ─── LOADING SCREEN ─── */
+#loading{
+  display:none;position:fixed;inset:0;z-index:900;background:#000;
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;
+}
+.ld-logo{
+  font-family:'Dancing Script',cursive;font-size:40px;font-weight:700;
+  background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ld-spinner{width:26px;height:26px;border:2.5px solid #222;border-top-color:#fff;border-radius:50%;animation:spin .75s linear infinite;}
+.ld-label{font-size:13px;color:#555;}
+.ld-bar{width:160px;height:2px;background:#1a1a1a;border-radius:1px;overflow:hidden;}
+.ld-fill{height:100%;background:linear-gradient(90deg,#f58529,#dd2a7b,#8134af);width:0%;transition:width .25s;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ─── APP SHELL ─── */
+#app{display:none;height:100dvh;position:relative;}
+
+/* ─── TOP BAR (from screenshot: "+ Reels ∨  Friends 🔔") ─── */
+.topbar{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:48px 12px 8px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.6) 0%,transparent 100%);
+  pointer-events:none;
+}
+.topbar *{pointer-events:auto;}
+.tb-left{display:flex;align-items:center;gap:0;}
+.tb-plus{color:#fff;font-size:24px;font-weight:300;line-height:1;cursor:pointer;padding:4px 10px 4px 4px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));}
+.tb-title-wrap{display:flex;align-items:center;gap:3px;cursor:pointer;padding:4px 2px;}
+.tb-title{font-size:17px;font-weight:700;color:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));letter-spacing:-.1px;}
+.tb-caret{width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:4.5px solid rgba(255,255,255,.9);margin-top:2px;flex-shrink:0;}
+.tb-library{font-size:17px;font-weight:400;color:rgba(255,255,255,.45);cursor:pointer;padding:4px 0 4px 10px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4));}
+.tb-right{display:flex;align-items:center;gap:0;}
+.tb-icon-btn{background:none;border:none;cursor:pointer;padding:4px 6px;display:flex;align-items:center;justify-content:center;}
+.tb-icon-btn svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));stroke-linecap:round;stroke-linejoin:round;}
+
+/* ─── REEL FEED ─── */
+.feed{
+  height:100dvh;overflow-y:scroll;
+  scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.feed::-webkit-scrollbar{display:none;}
+
+/* ─── SINGLE REEL ─── */
+.reel{
+  height:100dvh;width:100%;
+  scroll-snap-align:start;scroll-snap-stop:always;
+  position:relative;background:#000;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;
+}
+.reel-bg{position:absolute;inset:0;z-index:0;}
+.reel-bg-color{position:absolute;inset:0;}
+/* The gradient shadow at bottom — exactly like Instagram */
+.reel-bg-shadow{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    180deg,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0) 40%,
+    rgba(0,0,0,.15) 60%,
+    rgba(0,0,0,.6) 80%,
+    rgba(0,0,0,.75) 100%
+  );
+}
+
+/* ─── BOOK TEXT — centered in reel ─── */
+.reel-text-wrap{
+  position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:76%;text-align:center;z-index:10;
+  pointer-events:none;
+}
+.reel-chapter-lbl{
+  font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);margin-bottom:14px;
+}
+.reel-body{
+  font-size:clamp(15px,4.2vw,20px);font-weight:400;line-height:1.75;
+  color:#fff;text-shadow:0 1px 18px rgba(0,0,0,.9);letter-spacing:.1px;
+}
+.reel-body.t-title{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(30px,8vw,42px);font-weight:700;line-height:1.2;
+  background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.reel-body.t-heading{
+  font-size:clamp(18px,5vw,24px);font-weight:700;line-height:1.35;
+}
+
+/* ─── RIGHT SIDEBAR — pixel perfect from screenshot ─── */
+/* From screenshot: heart (405K), repost (2027), send (36.4K), save (10.6K), ⋮, avatar */
+.sidebar{
+  position:absolute;right:10px;bottom:90px;z-index:20;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+}
+.sb-item{
+  display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:10px 6px;cursor:pointer;user-select:none;
+}
+.sb-item svg{
+  width:30px;height:30px;
+  fill:none;stroke:#fff;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 1px 5px rgba(0,0,0,.7));
+  transition:transform .15s ease;
+  display:block;
+}
+.sb-item:active svg{transform:scale(1.25);}
+.sb-count{
+  font-size:13px;font-weight:600;color:#fff;
+  text-shadow:0 1px 4px rgba(0,0,0,.8);line-height:1;
+}
+/* liked */
+.sb-item.liked svg{stroke:#ed4956;fill:#ed4956;}
+/* saved */
+.sb-item.saved svg{fill:#fff;}
+/* three dot */
+.sb-dots{
+  display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:8px 6px;cursor:pointer;
+}
+.sb-dots span{display:block;width:4px;height:4px;border-radius:50%;background:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));}
+/* spinning disc avatar at bottom of sidebar */
+.sb-disc{
+  width:34px;height:34px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,.5);
+  background:linear-gradient(135deg,#1a1a1a,#333);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;animation:spin 7s linear infinite;
+  margin-top:6px;
+}
+
+/* heart burst */
+@keyframes heartPop{0%{transform:scale(1)}30%{transform:scale(1.6)}65%{transform:scale(1.1)}100%{transform:scale(1)}}
+.heart-pop{animation:heartPop .35s ease forwards;}
+
+/* double tap heart */
+.dbl-heart{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:90px;z-index:50;pointer-events:none;opacity:0;
+  animation:dblH .7s ease forwards;
+}
+@keyframes dblH{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
+  35%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
+  65%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+}
+
+/* ─── BOTTOM INFO (from screenshot: avatar + username + follow + caption + ...) ─── */
+.reel-info{
+  position:relative;z-index:10;
+  padding:0 12px 12px 12px;
+  margin-bottom:58px; /* above bottom nav */
+  max-width:calc(100% - 70px); /* don't overlap sidebar */
+}
+.ri-user-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.ri-avatar{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  border:1.5px solid rgba(255,255,255,.7);
+  background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  overflow:hidden;
+}
+.ri-name{font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+/* "uncle_shadyyy and 3 others" style — with bold name */
+.ri-also{font-size:13px;color:rgba(255,255,255,.75);}
+.ri-follow{
+  margin-left:2px;padding:4px 12px;border:1.5px solid rgba(255,255,255,.9);
+  border-radius:8px;background:transparent;color:#fff;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  text-shadow:none;flex-shrink:0;
+}
+.ri-caption{font-size:14px;color:#fff;line-height:1.45;margin-bottom:8px;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+/* music row — "♫ Original audio · bookname" */
+.ri-music{display:flex;align-items:center;gap:6px;}
+.ri-music-icon{font-size:12px;animation:spin 4s linear infinite;display:inline-block;flex-shrink:0;}
+.ri-music-txt{font-size:13px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+
+/* ─── BOTTOM NAV — exact from screenshot ─── */
+/* Screenshot: home, reels(play), send(paper plane), search, profile-circle */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;z-index:200;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:8px 0 calc(10px + env(safe-area-inset-bottom));
+  background:rgba(0,0,0,.88);
+  border-top:.5px solid rgba(255,255,255,.06);
+}
+.bn-btn{
+  flex:1;background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px 0;
+}
+.bn-btn svg{width:27px;height:27px;fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.9;transition:stroke .15s;}
+.bn-btn.active svg{stroke:#fff;}
+.bn-btn.active .svg-fill{fill:#fff;stroke:#fff;}
+
+/* ─── SHEETS ─── */
+.sheet-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;
+  align-items:flex-end;
+}
+.sheet-bg.open{display:flex;}
+.sheet{
+  width:100%;max-width:430px;margin:0 auto;
+  background:#1c1c1c;border-radius:16px 16px 0 0;
+  max-height:80vh;overflow-y:auto;scrollbar-width:none;
+}
+.sheet::-webkit-scrollbar{display:none;}
+.sh-handle{width:36px;height:4px;background:#3a3a3a;border-radius:2px;margin:12px auto 14px;}
+.sh-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px 14px;border-bottom:.5px solid #262626;
+}
+.sh-title{font-size:16px;font-weight:700;}
+.sh-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1;padding:0 2px;}
+
+/* notes */
+.notes-list{padding:10px 16px;display:flex;flex-direction:column;gap:10px;}
+.note-card{background:#262626;border-radius:12px;padding:12px 14px;}
+.note-meta{font-size:11px;color:#555;margin-bottom:4px;}
+.note-txt{font-size:14px;line-height:1.55;}
+.notes-empty{padding:44px 20px;text-align:center;color:#555;font-size:14px;}
+.note-bar{display:flex;gap:10px;align-items:center;padding:10px 14px;border-top:.5px solid #262626;}
+.note-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.note-inp{flex:1;background:#262626;border:none;border-radius:22px;padding:9px 15px;color:#fff;font-size:14px;font-family:inherit;outline:none;resize:none;min-height:38px;max-height:100px;}
+.note-inp::placeholder{color:#555;}
+.note-post{background:none;border:none;color:#0095f6;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;padding:6px 2px;}
+
+/* share */
+.share-grid{display:grid;grid-template-columns:repeat(4,1fr);padding:16px;gap:4px;}
+.sh-icon-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 4px;border-radius:12px;cursor:pointer;}
+.sh-icon-item:active{background:#262626;}
+.sh-icon-circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.sh-icon-lbl{font-size:11px;color:#a8a8a8;text-align:center;}
+.sh-divider{height:.5px;background:#262626;margin:0 16px;}
+.sh-rows{padding:4px 0 8px;}
+.sh-row{padding:15px 20px;font-size:15px;cursor:pointer;color:#fff;}
+.sh-row:active{background:#262626;}
+
+/* saved */
+.saved-empty{padding:48px 20px;text-align:center;color:#555;font-size:14px;line-height:1.7;}
+.saved-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:.5px solid #262626;cursor:pointer;}
+.saved-item:active{background:#262626;}
+.saved-num{width:36px;height:36px;background:#262626;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#666;flex-shrink:0;}
+.saved-txt{font-size:14px;color:#fff;line-height:1.45;flex:1;}
+
+/* swipe hint */
+.swipe-hint{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  z-index:100;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  animation:hintFade 4s ease forwards;
+}
+@keyframes hintFade{0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.sh-arrow{width:20px;height:20px;border-left:2.5px solid rgba(255,255,255,.6);border-top:2.5px solid rgba(255,255,255,.6);transform:rotate(45deg);animation:arrowBounce .9s ease infinite;}
+@keyframes arrowBounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(-5px)}}
+.sh-txt{font-size:11px;color:rgba(255,255,255,.6);letter-spacing:1.5px;text-transform:uppercase;}
+
+/* toast */
+#toast{
+  position:fixed;bottom:82px;left:50%;transform:translateX(-50%);
+  background:#262626;color:#fff;padding:9px 20px;border-radius:22px;
+  font-size:13px;z-index:999;white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .3s;font-family:inherit;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ UPLOAD ══ -->
+<div id="upload">
+  <div class="up-logo">BookGram</div>
+  <div class="up-sub">Read like you scroll</div>
+  <div class="up-dropzone" id="dropzone">
+    <input type="file" id="file-in" accept=".pdf,.txt">
+    <div class="up-icon">📖</div>
+    <h3>Drop your book here</h3>
+    <p>PDF or TXT — converts to reel-style reading instantly</p>
+  </div>
+  <button class="up-btn" onclick="document.getElementById('file-in').click()">Choose File</button>
+  <div class="up-pills">
+    <span class="up-pill">PDF</span>
+    <span class="up-pill">TXT</span>
+    <span class="up-pill">EPUB soon</span>
+  </div>
+</div>
+
+<!-- ══ LOADING ══ -->
+<div id="loading">
+  <div class="ld-logo">BookGram</div>
+  <div class="ld-spinner"></div>
+  <div class="ld-label" id="ld-label">Reading your book…</div>
+  <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-plus" onclick="triggerUpload()">+</div>
+      <div class="tb-title-wrap">
+        <span class="tb-title">BookGram</span>
+        <div class="tb-caret"></div>
+      </div>
+      <span class="tb-library">Library</span>
+    </div>
+    <div class="tb-right">
+      <!-- Camera icon (like Instagram's top-right camera) -->
+      <button class="tb-icon-btn" onclick="triggerUpload()" title="Upload book">
+        <svg viewBox="0 0 24 24">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </button>
+      <!-- DM icon (like Instagram's paper plane) -->
+      <button class="tb-icon-btn" onclick="openNotes(S.cur)" title="Notes">
+        <svg viewBox="0 0 24 24">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div class="feed" id="feed"></div>
+
+  <!-- BOTTOM NAV — matches screenshot: home, play/reels, send, search, profile -->
+  <nav class="bottom-nav">
+    <button class="bn-btn active" id="bn0">
+      <!-- Home -->
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z" class="svg-fill"/></svg>
+    </button>
+    <button class="bn-btn" id="bn1">
+      <!-- Reels / Play -->
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" class="svg-fill" style="fill:#fff" stroke="none"/></svg>
+    </button>
+    <button class="bn-btn" id="bn2" onclick="openShare(S.cur)">
+      <!-- Send / Paper plane — from screenshot -->
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+    <button class="bn-btn" id="bn3" onclick="openSaved()">
+      <!-- Search -->
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    </button>
+    <button class="bn-btn" id="bn4" onclick="showStats()">
+      <!-- Profile circle -->
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="9" r="3"/><path d="M6.5 19c.5-3 2.5-5 5.5-5s5 2 5.5 5"/></svg>
+    </button>
+  </nav>
+</div>
+
+<!-- ══ NOTES SHEET ══ -->
+<div class="sheet-bg" id="notes-bg" onclick="bgClose(event,'notes-bg')">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <span class="sh-title">Notes</span>
+      <button class="sh-close" onclick="closeSheet('notes-bg')">×</button>
+    </div>
+    <div class="notes-list" id="notes-list"></div>
+    <div class="note-bar">
+      <div class="note-av">📖</div>
+      <textarea class="note-inp" id="note-inp" placeholder="Add a note…" rows="1"></textarea>
+      <button class="note-post" onclick="postNote()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHARE SHEET ══ -->
+<div class="sheet-bg" id="share-bg" onclick="bgClose(event,'share-bg')">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="share-grid">
+      <div class="sh-icon-item" onclick="doShare('copy')">
+        <div class="sh-icon-circle" style="background:#262626">📋</div>
+        <span class="sh-icon-lbl">Copy text</span>
+      </div>
+      <div class="sh-icon-item" onclick="doShare('whatsapp')">
+        <div class="sh-icon-circle" style="background:#25D366">💬</div>
+        <span class="sh-icon-lbl">WhatsApp</span>
+      </div>
+      <div class="sh-icon-item" onclick="doShare('twitter')">
+        <div class="sh-icon-circle" style="background:#000;border:1px solid #333">𝕏</div>
+        <span class="sh-icon-lbl">X (Twitter)</span>
+      </div>
+      <div class="sh-icon-item" onclick="doShare('native')">
+        <div class="sh-icon-circle" style="background:#262626">⬆️</div>
+        <span class="sh-icon-lbl">More</span>
+      </div>
+    </div>
+    <div class="sh-divider"></div>
+    <div class="sh-rows">
+      <div class="sh-row" onclick="doShare('copy')">Copy passage</div>
+      <div class="sh-row" style="color:#737373" onclick="closeSheet('share-bg')">Cancel</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SAVED SHEET ══ -->
+<div class="sheet-bg" id="saved-bg" onclick="bgClose(event,'saved-bg')">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <span class="sh-title">Saved Passages</span>
+      <button class="sh-close" onclick="closeSheet('saved-bg')">×</button>
+    </div>
+    <div id="saved-list"></div>
+  </div>
+</div>
+
+<input type="file" id="file-in2" accept=".pdf,.txt" style="display:none">
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+const S = {
+  reels:[], title:'',
+  likes: new Set(), saves: new Set(),
+  notes: {},
+  cur: 0,
+  noteTarget: 0,
+  shareTarget: 0,
+};
+
+// ════════════════════════════════
+// SMART LOCAL CLEANER + CHUNKER
+// No API, no cost, instant
+// ════════════════════════════════
+function smartClean(raw) {
+  const lines = raw.split('\n');
+  const cleaned = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
+
+    // 1. Skip empty
+    if (!line) continue;
+
+    // 2. Skip pure page numbers (just digits, optionally with spaces/dashes)
+    if (/^[\d\s\-\u2013\u2014]+$/.test(line)) continue;
+
+    // 3. Skip very short lines that are clearly headers/footers (under 4 words, no sentence ending)
+    const words = line.split(/\s+/).filter(Boolean);
+    const endsLikeSentence = line.endsWith('.') || line.endsWith('?') || line.endsWith('!') || line.endsWith('"') || line.endsWith('\u2019');
+    if (words.length < 3 && !endsLikeSentence) {
+      if (words.length < 2) continue;
+    }
+
+    // 4. Skip lines that are purely roman numerals (TOC page refs)
+    if (/^[ivxlcdmIVXLCDM\s]+$/.test(line) && line.length < 15) continue;
+
+    // 5. Skip lines that look like TOC entries: "Some Title .......... 23"
+    if (/\.{3,}\s*\d+$/.test(line)) continue;
+    if (/\s{3,}\d+$/.test(line)) continue;
+
+    // 6. Skip copyright / ISBN lines
+    if (/isbn|copyright|©|all rights reserved|printed in|first published|published by/i.test(line)) continue;
+
+    // 7. Fix hyphenated line breaks: if line ends with hyphen, join with next
+    if (line.endsWith('-') && i + 1 < lines.length) {
+      line = line.slice(0, -1) + lines[i + 1].trim();
+      i++; // skip next line since we merged it
+    }
+
+    cleaned.push(line);
+  }
+
+  return cleaned.join('\n');
+}
+
+function chunkToReels(cleanText, title) {
+  const reels = [{ type:'title', text:title, chapter:'' }];
+  const lines = cleanText.split('\n').filter(l => l.trim().length > 1);
+  let chapter = '';
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const words = trimmed.split(/\s+/).length;
+
+    // Detect headings: short line, no sentence-ending punctuation, or ALL CAPS
+    const isAllCaps = trimmed === trimmed.toUpperCase() && trimmed.length > 3 && /[A-Z]/.test(trimmed);
+    const isShortTitle = words <= 8
+      && !trimmed.endsWith('.') && !trimmed.endsWith(',')
+      && !trimmed.endsWith(';') && trimmed.length < 80
+      && trimmed.length > 3;
+
+    if (isAllCaps || (isShortTitle && words <= 5)) {
+      chapter = trimmed;
+      reels.push({ type:'heading', text:trimmed, chapter:'' });
+      continue;
+    }
+
+    // Split into ~200-char chunks at sentence boundaries
+    // First collect all sentences from this line
+    const raw = trimmed;
+    // Split on sentence endings, keep delimiter
+    const sentenceRx = /[^.!?…]+[.!?…]+(?:\s|$)|[^.!?…]+$/g;
+    const sentences = raw.match(sentenceRx) || [raw];
+
+    let buffer = '';
+    for (const sent of sentences) {
+      const s = sent.trim();
+      if (!s) continue;
+
+      if (buffer.length === 0) {
+        buffer = s;
+      } else if ((buffer + ' ' + s).length <= 210) {
+        buffer += ' ' + s;
+      } else {
+        // flush buffer
+        if (buffer.length > 6) reels.push({ type:'text', text:buffer, chapter });
+        buffer = s;
+      }
+    }
+    if (buffer.length > 6) reels.push({ type:'text', text:buffer, chapter });
+  }
+
+  return reels;
+}
+
+// ════════════════════════════════
+// BG GRADIENTS
+// ════════════════════════════════
+const BGSEED = [
+  ['#0d0b18','#1e1842'],['#0b0f0d','#112918'],['#120b0b','#2e1010'],
+  ['#0b0f12','#0e1f2a'],['#130f0b','#2a1c08'],['#0b0b18','#101030'],
+  ['#120b14','#241030'],['#0c130b','#182a10'],['#0b1312','#0e2826'],
+  ['#181008','#301c08'],
+];
+
+// ════════════════════════════════
+// BUILD FEED
+// ════════════════════════════════
+function buildFeed(reels) {
+  S.reels = reels;
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+
+  reels.forEach((reel, i) => {
+    const [b1, b2] = BGSEED[i % BGSEED.length];
+    const hue = (i * 43) % 360;
+    const accent = `hsl(${hue},50%,28%)`;
+    const pct = Math.round((i / reels.length) * 100);
+    const isTitle = reel.type === 'title';
+    const isHead  = reel.type === 'heading';
+
+    const el = document.createElement('div');
+    el.className = 'reel';
+    el.dataset.i = i;
+
+    el.innerHTML = `
+      <div class="reel-bg">
+        <div class="reel-bg-color" style="background:radial-gradient(ellipse at 30% 35%,${accent}55 0%,${b1} 55%),linear-gradient(160deg,${b2},${b1})"></div>
+        <div class="reel-bg-shadow"></div>
+      </div>
+
+      <div class="reel-text-wrap">
+        ${reel.chapter ? `<div class="reel-chapter-lbl">${esc(reel.chapter)}</div>` : ''}
+        <div class="reel-body ${isTitle?'t-title':isHead?'t-heading':''}">${esc(reel.text)}</div>
+      </div>
+
+      <!-- RIGHT SIDEBAR — heart / comment / send / save / ⋮ / disc -->
+      <div class="sidebar">
+        <!-- Heart (like) -->
+        <div class="sb-item" id="like-${i}" onclick="toggleLike(${i})">
+          <svg viewBox="0 0 24 24">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span class="sb-count" id="lc${i}">0</span>
+        </div>
+        <!-- Comment / Notes -->
+        <div class="sb-item" onclick="openNotes(${i})">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="sb-count" id="nc${i}">0</span>
+        </div>
+        <!-- Send / Share -->
+        <div class="sb-item" onclick="openShare(${i})">
+          <svg viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <span class="sb-count">${fmtNum(Math.floor(Math.random()*500+10))}</span>
+        </div>
+        <!-- Save / Bookmark -->
+        <div class="sb-item" id="save-${i}" onclick="toggleSave(${i})">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="sb-count" id="sc${i}">0</span>
+        </div>
+        <!-- Three dots -->
+        <div class="sb-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <!-- Spinning disc -->
+        <div class="sb-disc">📚</div>
+      </div>
+
+      <!-- BOTTOM INFO -->
+      <div class="reel-info">
+        <div class="ri-user-row">
+          <div class="ri-avatar">📖</div>
+          <span class="ri-name">${esc(S.title.substring(0,18))}</span>
+          <button class="ri-follow">Follow</button>
+        </div>
+        <div class="ri-caption">${captionFor(reel)}</div>
+        <div class="ri-music">
+          <span class="ri-music-icon">♫</span>
+          <span class="ri-music-txt">Original reading · ${i+1}/${reels.length} · ${pct}%</span>
+        </div>
+      </div>
+    `;
+
+    // Double tap
+    let last = 0;
+    el.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - last < 280) showDblHeart(i, el);
+      last = now;
+    });
+    el.addEventListener('dblclick', () => showDblHeart(i, el));
+
+    feed.appendChild(el);
+  });
+
+  // track current
+  const feed2 = document.getElementById('feed');
+  feed2.addEventListener('scroll', () => {
+    S.cur = Math.round(feed2.scrollTop / window.innerHeight);
+  }, { passive: true });
+
+  // swipe hint
+  const hint = document.createElement('div');
+  hint.className = 'swipe-hint';
+  hint.innerHTML = `<div class="sh-arrow"></div><span class="sh-txt">Swipe up</span>`;
+  document.getElementById('app').appendChild(hint);
+  setTimeout(() => hint.remove(), 5000);
+}
+
+function captionFor(r) {
+  if (r.type === 'title') return 'Start reading ✨';
+  if (r.type === 'heading') return '📌 ' + esc(r.text.substring(0, 50));
+  return esc(r.text.substring(0, 70)) + (r.text.length > 70 ? '…' : '');
+}
+function esc(s='') { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtNum(n) { return n >= 1000 ? (n/1000).toFixed(1)+'K' : n; }
+
+// ════════════════════════════════
+// INTERACTIONS
+// ════════════════════════════════
+function toggleLike(i) {
+  const el = document.getElementById(`like-${i}`);
+  const svg = el.querySelector('svg');
+  const cnt = document.getElementById(`lc${i}`);
+  if (S.likes.has(i)) {
+    S.likes.delete(i);
+    el.classList.remove('liked');
+    cnt.textContent = Math.max(0, parseInt(cnt.textContent) - 1) || '0';
+  } else {
+    S.likes.add(i);
+    el.classList.add('liked');
+    cnt.textContent = fmtNum((parseInt(cnt.textContent.replace('K',''))*1||0) + 1);
+    svg.classList.add('heart-pop');
+    setTimeout(() => svg.classList.remove('heart-pop'), 350);
+  }
+}
+
+function showDblHeart(i, el) {
+  if (!S.likes.has(i)) toggleLike(i);
+  const h = document.createElement('div');
+  h.className = 'dbl-heart'; h.textContent = '❤️';
+  el.appendChild(h);
+  setTimeout(() => h.remove(), 750);
+}
+
+function toggleSave(i) {
+  const el = document.getElementById(`save-${i}`);
+  const cnt = document.getElementById(`sc${i}`);
+  if (S.saves.has(i)) {
+    S.saves.delete(i);
+    el.classList.remove('saved');
+    cnt.textContent = Math.max(0, parseInt(cnt.textContent) - 1) || '0';
+  } else {
+    S.saves.add(i);
+    el.classList.add('saved');
+    cnt.textContent = parseInt(cnt.textContent) + 1;
+    toast('Saved ✓');
+  }
+}
+
+// ── NOTES ──
+function openNotes(i) {
+  S.noteTarget = i;
+  renderNotes();
+  openSheet('notes-bg');
+}
+function renderNotes() {
+  const arr = S.notes[S.noteTarget] || [];
+  const el = document.getElementById('notes-list');
+  if (!arr.length) { el.innerHTML = '<div class="notes-empty">No notes yet. Add your thoughts below.</div>'; return; }
+  el.innerHTML = arr.map(n => `
+    <div class="note-card">
+      <div class="note-meta">Reel ${S.noteTarget+1} · ${n.ts}</div>
+      <div class="note-txt">${esc(n.text)}</div>
+    </div>`).join('');
+}
+function postNote() {
+  const ta = document.getElementById('note-inp');
+  const v = ta.value.trim(); if (!v) return;
+  if (!S.notes[S.noteTarget]) S.notes[S.noteTarget] = [];
+  S.notes[S.noteTarget].push({ text:v, ts:new Date().toLocaleTimeString() });
+  ta.value = '';
+  const nc = document.getElementById(`nc${S.noteTarget}`);
+  if (nc) nc.textContent = S.notes[S.noteTarget].length;
+  renderNotes();
+}
+
+// ── SHARE ──
+function openShare(i) { S.shareTarget = i; openSheet('share-bg'); }
+function doShare(type) {
+  const text = S.reels[S.shareTarget]?.text || '';
+  closeSheet('share-bg');
+  if (type === 'copy') navigator.clipboard?.writeText(text).then(() => toast('Copied!'));
+  else if (type === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent('"'+text+'"')}`);
+  else if (type === 'twitter') window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('"'+text+'" — '+S.title)}`);
+  else navigator.share?.({ text, title:S.title }) || navigator.clipboard?.writeText(text).then(() => toast('Copied!'));
+}
+
+// ── SAVED ──
+function openSaved() {
+  const el = document.getElementById('saved-list');
+  if (!S.saves.size) {
+    el.innerHTML = '<div class="saved-empty">📑<br><br>Tap the bookmark icon on any reel<br>to save passages here.</div>';
+  } else {
+    el.innerHTML = [...S.saves].map(i => `
+      <div class="saved-item" onclick="goTo(${i});closeSheet('saved-bg')">
+        <div class="saved-num">${i+1}</div>
+        <div class="saved-txt">${esc((S.reels[i]?.text||'').substring(0,90))}…</div>
+      </div>`).join('');
+  }
+  openSheet('saved-bg');
+}
+function goTo(i) {
+  document.getElementById('feed').scrollTo({ top: i * window.innerHeight, behavior: 'smooth' });
+}
+
+// ── STATS ──
+function showStats() {
+  const pct = S.reels.length ? Math.round((S.cur / S.reels.length) * 100) : 0;
+  const nn = Object.values(S.notes).flat().length;
+  toast(`${pct}% read · ${S.saves.size} saved · ${nn} note${nn!==1?'s':''}`);
+}
+
+// ── SHEET HELPERS ──
+function openSheet(id) { document.getElementById(id).classList.add('open'); }
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+function bgClose(e, id) { if (e.target === document.getElementById(id)) closeSheet(id); }
+
+// ── TOAST ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.style.opacity = '0', 2200);
+}
+
+// ════════════════════════════════
+// FILE PROCESSING
+// ════════════════════════════════
+function triggerUpload() { document.getElementById('file-in2').click(); }
+
+async function handleFile(file) {
+  S.title = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ').trim();
+  showLoad('Reading file…');
+  try {
+    setP(10);
+    const raw = file.name.toLowerCase().endsWith('.pdf')
+      ? await readPDF(file)
+      : await file.text();
+    setP(55);
+    setLabel('Cleaning text…');
+    const cleaned = smartClean(raw);
+    setP(78);
+    setLabel('Building reels…');
+    const reels = chunkToReels(cleaned, S.title);
+    setP(100);
+    setLabel('Done!');
+    setTimeout(() => { hideLoad(); showApp(reels); }, 350);
+  } catch (err) {
+    console.error(err);
+    hideLoad();
+    document.getElementById('upload').style.display = 'flex';
+    alert('Could not read file. Try a different PDF or TXT.');
+  }
+}
+
+async function readPDF(file) {
+  await new Promise(r => { const c=()=>window._pdfReady?r():setTimeout(c,80); c(); });
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let out = '';
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const pg = await pdf.getPage(p);
+    const tc = await pg.getTextContent();
+    let lastY = null;
+    for (const item of tc.items) {
+      if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) out += '\n';
+      out += item.str + ' ';
+      lastY = item.transform[5];
+    }
+    out += '\n';
+    setP(10 + Math.round((p / pdf.numPages) * 42));
+  }
+  return out;
+}
+
+function showLoad(lbl='Loading…') {
+  document.getElementById('upload').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+  setLabel(lbl); setP(0);
+}
+function hideLoad() { document.getElementById('loading').style.display = 'none'; }
+function setP(v) { document.getElementById('ld-fill').style.width = v + '%'; }
+function setLabel(t) { document.getElementById('ld-label').textContent = t; }
+function showApp(reels) {
+  document.getElementById('upload').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  buildFeed(reels);
+}
+
+// ── FILE INPUTS ──
+['file-in','file-in2'].forEach(id => {
+  document.getElementById(id).addEventListener('change', e => {
+    if (e.target.files[0]) handleFile(e.target.files[0]);
+  });
+});
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+</script>
+</body>
+</html>
